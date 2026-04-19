@@ -733,16 +733,12 @@ table.ranking-table tr:last-child td { border-bottom: none; }
     display: flex;
     flex-direction: column;
   }
-  /* Reordenar via order para que ganador aparezca primero siempre */
-  .eq-col.ganador { order: 1; }
   .eq-col.center-score { 
-    order: 2;
     border: none; 
     border-top: 1px solid var(--gris-claro); 
     border-bottom: 1px solid var(--gris-claro);
     padding: 16px;
   }
-  .eq-col.perdedor { order: 3; }
   .eq-nombre { font-size: 1.2rem; }
   .score-big { font-size: 2.2rem; }
 
@@ -1179,16 +1175,13 @@ function renderEdicion(num) {
     </tr>`;
   }
 
-  // Header equipos con color del año
-  const bgA = teamBg(e.equipoA, ganadorA);
-  const bgB = teamBg(e.equipoB, !ganadorA);
-  const txtA = teamTextColor(e.equipoA, ganadorA);
-  const txtB = teamTextColor(e.equipoB, !ganadorA);
-
-  function eqHeaderHtml(eq, isA, isWinner, bg, txt) {
+  // Header equipos: A siempre izquierda, B siempre derecha
+  function eqColHtml(eq, isWinner) {
+    const bg = eq?.color1 ? colorHex(eq.color1) : (isWinner ? 'var(--verde)' : 'var(--crema)');
+    const txt = teamTextColor(eq, isWinner);
     const badge = isWinner
-      ? `<span class="eq-badge campeon" style="background:rgba(255,255,255,0.25);color:${txt === 'var(--negro)' ? 'var(--negro)' : 'white'}">🏆 Campeón</span>`
-      : `<span class="eq-badge subcampeon" style="background:rgba(0,0,0,0.1);color:${txt}">Subcampeón</span>`;
+      ? `<span class="eq-badge campeon" style="background:rgba(255,255,255,0.22);color:${txt==='var(--negro)'?'var(--negro)':'white'}">🏆 Campeón</span>`
+      : `<span class="eq-badge subcampeon" style="background:rgba(0,0,0,0.08);color:${txt}">Subcampeón</span>`;
     return `<div class="eq-col" style="background:${bg};color:${txt};text-align:center;padding:24px 20px">
       ${badge}
       <div class="eq-nombre" style="color:${txt}">${eq?.nombre||'—'}</div>
@@ -1201,28 +1194,11 @@ function renderEdicion(num) {
     <div class="puntos-desglose">Par: ${st.ptParA}–${st.ptParB} · Ind: ${st.ptIndA}–${st.ptIndB}</div>
     <div class="score-fecha">${e.fecha1} · ${e.campo1} / ${e.campo2}</div>`;
 
-  // Ganador a la izquierda siempre
-  const [colIzq, colDcha] = ganadorA
-    ? [eqHeaderHtml(e.equipoA, true,  true,  bgA, txtA), eqHeaderHtml(e.equipoB, false, false, bgB, txtB)]
-    : [eqHeaderHtml(e.equipoB, false, true,  bgB, txtB), eqHeaderHtml(e.equipoA, true,  false, bgA, txtA)];
-  const [thIzq, thDcha] = ganadorA
-    ? [e.equipoA?.nombre, e.equipoB?.nombre]
-    : [e.equipoB?.nombre, e.equipoA?.nombre];
-  const [ptParIzq, ptParDcha] = ganadorA ? [st.ptParA, st.ptParB] : [st.ptParB, st.ptParA];
-  const [ptIndIzq, ptIndDcha] = ganadorA ? [st.ptIndA, st.ptIndB] : [st.ptIndB, st.ptIndA];
-
-  // Para la tabla: si ganadorB, invertir las filas de partido
-  function invertirFila(rowFn, r) {
-    if (ganadorA) return rowFn(r);
-    // swap A↔B perspective
-    return rowFn(r); // las funciones ya normalizan según codA
-  }
-
   const html = `
     <div class="edicion-header">
-      ${colIzq}
+      ${eqColHtml(e.equipoA, ganadorA)}
       <div class="eq-col center-score">${scoreHtml}</div>
-      ${colDcha}
+      ${eqColHtml(e.equipoB, !ganadorA)}
     </div>
 
     <div class="jornada-section">
