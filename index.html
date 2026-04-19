@@ -1132,9 +1132,9 @@ function renderEdicion(num) {
     const rowClass = rdo > 0 ? 'ganador-A' : rdo < 0 ? 'ganador-B' : '';
     const {txt, cls} = fmtMatch(r.rdoA, r.hoyos, eqAisA);
     return `<tr class="${rowClass}">
-      <td class="bold">${leftName}</td>
+      <td ${rdo > 0 ? 'class="bold"' : ""}>${leftName}</td>
       <td style="text-align:center"><span class="resultado-pill ${cls}">${txt}</span></td>
-      <td>${rightName}</td>
+      <td ${rdo < 0 ? 'class="bold"' : ""}>${rightName}</td>
       <td class="pts-cell" style="text-align:right">${eqAisA ? r.ptosA : r.ptosB} – ${eqAisA ? r.ptosB : r.ptosA}</td>
     </tr>`;
   }
@@ -1147,9 +1147,9 @@ function renderEdicion(num) {
     const rowClass = rdo > 0 ? 'ganador-A' : rdo < 0 ? 'ganador-B' : '';
     const {txt, cls} = fmtMatch(r.rdoA, r.hoyos, eqAisA);
     return `<tr class="${rowClass}">
-      <td class="bold">${leftName||'—'}</td>
+      <td ${rdo > 0 ? 'class="bold"' : ""}>${leftName||'—'}</td>
       <td style="text-align:center"><span class="resultado-pill ${cls}">${txt}</span></td>
-      <td>${rightName||'—'}</td>
+      <td ${rdo < 0 ? 'class="bold"' : ""}>${rightName||'—'}</td>
       <td class="pts-cell" style="text-align:right">${eqAisA ? r.ptosA : r.ptosB} – ${eqAisA ? r.ptosB : r.ptosA}</td>
     </tr>`;
   }
