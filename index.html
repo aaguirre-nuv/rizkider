@@ -658,14 +658,112 @@ table.ranking-table tr:last-child td { border-bottom: none; }
 .color-oro { color: var(--oro); }
 .bold { font-weight: 700; }
 
+/* ── MOBILE ── */
 @media (max-width: 700px) {
-  .home-hero { grid-template-columns: 1fr; }
-  .stats-bar { grid-template-columns: repeat(2, 1fr); }
-  .rankings-grid { grid-template-columns: 1fr; }
-  .edicion-header { grid-template-columns: 1fr; }
-  .eq-col.center-score { border: none; border-top: 1px solid var(--gris-claro); border-bottom: 1px solid var(--gris-claro); }
-  nav button span { display: none; }
-  .ficha-header { grid-template-columns: 1fr; }
+
+  /* Header compacto */
+  .header-inner { gap: 10px; padding: 8px 12px; }
+  .header-logo { height: 40px; }
+  .header-title { font-size: 1rem; line-height: 1.1; }
+  
+  /* Nav: scroll horizontal, sin texto truncado */
+  nav {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+  nav::-webkit-scrollbar { display: none; }
+  nav button {
+    font-size: 0.72rem;
+    padding: 6px 10px;
+    white-space: nowrap;
+    letter-spacing: 0.04em;
+  }
+
+  /* Main padding reducido */
+  main { padding: 16px 12px 48px; }
+
+  /* Home */
+  .home-hero { grid-template-columns: 1fr; gap: 16px; }
+  .hero-logo-wrap { display: none; }
+  .hero-titulo { font-size: 2.4rem; }
+  .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stat-card { padding: 16px 10px; }
+  .stat-num { font-size: 2rem; }
+
+  /* Score en home */
+  .match-scoreboard { 
+    grid-template-columns: 1fr; 
+    gap: 8px; 
+    text-align: center; 
+  }
+  .score-vs { font-size: 2.4rem; }
+
+  /* Edicion header: ganador arriba destacado, score en medio, perdedor abajo */
+  .edicion-header { 
+    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+  }
+  /* Reordenar via order para que ganador aparezca primero siempre */
+  .eq-col.ganador { order: 1; }
+  .eq-col.center-score { 
+    order: 2;
+    border: none; 
+    border-top: 1px solid var(--gris-claro); 
+    border-bottom: 1px solid var(--gris-claro);
+    padding: 16px;
+  }
+  .eq-col.perdedor { order: 3; }
+  .eq-nombre { font-size: 1.2rem; }
+  .score-big { font-size: 2.2rem; }
+
+  /* Tabla partidos: más compacta */
+  table.matches-table th,
+  table.matches-table td { 
+    padding: 8px 10px;
+    font-size: 0.82rem;
+  }
+  /* Ocultar columna puntos en móvil para ganar espacio */
+  table.matches-table th:last-child,
+  table.matches-table td:last-child { display: none; }
+
+  /* Jornada header */
+  .jornada-header { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .jornada-score { font-size: 0.95rem; }
+  .jornada-titulo { font-size: 0.75rem; }
+
+  /* Timeline años */
+  .year-timeline { gap: 4px; }
+  .year-btn { font-size: 0.82rem; padding: 6px 10px; }
+
+  /* Rankings */
+  .rankings-grid { grid-template-columns: 1fr; gap: 14px; }
+
+  /* Palmarés: ocultar col edición en móvil */
+  table.om-table th:nth-child(2),
+  table.om-table td:nth-child(2) { display: none; }
+  table.om-table th,
+  table.om-table td { padding: 10px 12px; font-size: 0.85rem; }
+
+  /* Jugador ficha */
+  .ficha-header { 
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 20px 16px;
+  }
+  .ficha-nombre { font-size: 1.5rem; }
+  .ficha-stats { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .ficha-stat { padding: 8px 4px; }
+  .ficha-stat-num { font-size: 1.3rem; }
+
+  /* Selector jugador */
+  .jugador-select { max-width: 100%; }
+
+  /* Section titles */
+  .section-title { font-size: 1.4rem; }
 }
 </style>
 </head>
@@ -806,7 +904,7 @@ function computePlayerStats() {
   D.jugadores.forEach(j => {
     stats[j.num] = {
       num: j.num, mote: j.mote, nombre: j.nombre,
-      ediciones: 0, ryders: 0, pts: 0, ptsInd: 0, ptsPar: 0,
+      ediciones: 0, copas: 0, ryders: 0, pts: 0, ptsInd: 0, ptsPar: 0,
       ganados: 0, empatados: 0, perdidos: 0,
       ganInd: 0, ganPar: 0, perInd: 0, perPar: 0,
     };
@@ -853,6 +951,19 @@ function computePlayerStats() {
     }).length;
   });
 
+  // copas = editions won as team member
+  D.ediciones.filter(e => e.jugada).forEach(edic => {
+    const st = computeEdicionStats(edic.edicion);
+    if (!st) return;
+    const ganadorCod = st.totalA >= st.totalB ? edic.equipoA?.cod : edic.equipoB?.cod;
+    D.jugadores.forEach(j => {
+      const equipoCod = (j.equipos || {})[edic.edicion];
+      if (equipoCod === ganadorCod && stats[j.num]) {
+        stats[j.num].copas++;
+      }
+    });
+  });
+
   return stats;
 }
 
@@ -867,7 +978,7 @@ function showSection(id) {
   document.getElementById('nav-'+id)?.classList.add('active');
   currentSection = id;
   if (id === 'ediciones' && !document.querySelector('.year-btn.activo')) {
-    selectEdicion(18); // default 2024
+    selectEdicion(19); // default última edición
   }
 }
 
@@ -1181,7 +1292,7 @@ function mostrarJugador(num) {
       </div>
       <div class="ficha-stats">
         <div class="ficha-stat"><div class="ficha-stat-num">${s.ediciones}</div><div class="ficha-stat-label">Ediciones</div></div>
-        <div class="ficha-stat"><div class="ficha-stat-num">${s.ganados}</div><div class="ficha-stat-label">Ryders gan.</div></div>
+        <div class="ficha-stat"><div class="ficha-stat-num">${s.copas}</div><div class="ficha-stat-label">Copas</div></div>
         <div class="ficha-stat"><div class="ficha-stat-num">${s.pts}</div><div class="ficha-stat-label">Puntos</div></div>
       </div>
     </div>
@@ -1230,13 +1341,15 @@ function buildRankings() {
   }
 
   const pct = s => s.ryders > 0 ? parseFloat(((s.ganados + s.empatados*0.5)/s.ryders*100).toFixed(1)) : 0;
+  const pctCopas = s => s.ediciones > 0 ? parseFloat((s.copas/s.ediciones*100).toFixed(1)) : 0;
 
   document.getElementById('rankings-grid').innerHTML = [
-    top10('Ryders ganados', 'Total victorias (ind + parejas)', s => s.ganados),
+    top10('Copas ganadas', 'Ediciones ganadas como equipo', s => s.copas),
     top10('Puntos totales', 'Suma de todos los puntos', s => parseFloat(s.pts.toFixed(1))),
     top10('Partidos individuales ganados', 'Solo jornada individual', s => s.ganInd),
     top10('Partidos de parejas ganados', 'Solo jornada de parejas', s => s.ganPar),
-    top10('% Victorias', 'Min. 3 partidos jugados', pct, '%'),
+    top10('% Partidos ganados', 'Min. 3 partidos, ind+par', pct, '%'),
+    top10('% Copas', 'Ediciones ganadas / jugadas', pctCopas, '%'),
     top10('Partidos jugados', 'Total individual + parejas', s => s.ryders),
     top10('Puntos individual', 'Solo jornada individual', s => parseFloat(s.ptsInd.toFixed(1))),
     top10('Puntos parejas', 'Solo jornada de parejas', s => parseFloat(s.ptsPar.toFixed(1))),
