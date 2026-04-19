@@ -429,8 +429,19 @@ table.matches-table td {
   border-bottom: 1px solid var(--gris-claro);
 }
 table.matches-table tr:last-child td { border-bottom: none; }
-table.matches-table tr.ganador-A td { background: rgba(27,82,41,0.04); }
-table.matches-table tr.ganador-B td { background: rgba(200,150,12,0.04); }
+/* Ganador: franja + fondo en celda del nombre */
+table.matches-table tr.ganador-A td:first-child {
+  border-left: 4px solid var(--match-color-a, var(--verde));
+  background: color-mix(in srgb, var(--match-color-a, var(--verde)) 12%, transparent);
+  font-weight: 700;
+}
+table.matches-table tr.ganador-B td:nth-child(3) {
+  border-right: 4px solid var(--match-color-b, var(--oro));
+  background: color-mix(in srgb, var(--match-color-b, var(--oro)) 12%, transparent);
+  font-weight: 700;
+}
+table.matches-table tr.ganador-A td,
+table.matches-table tr.ganador-B td { background: transparent; }
 .resultado-pill {
   display: inline-block;
   padding: 2px 8px;
@@ -1190,7 +1201,7 @@ function renderEdicion(num) {
         <div class="jornada-titulo">Jornada 1 · Parejas (Greensome Chapman)</div>
         <div class="jornada-score">${e.equipoA?.nombre?.split("'")[0]} ${st.ptParA} – ${st.ptParB} ${e.equipoB?.nombre?.split("'")[0]}</div>
       </div>
-      <table class="matches-table">
+      <table class="matches-table" style="--match-color-a:${colorHex(e.equipoA?.color1)};--match-color-b:${colorHex(e.equipoB?.color1)}">
         <thead><tr>
           <th>${e.equipoA?.nombre}</th><th style="text-align:center">Resultado</th>
           <th>${e.equipoB?.nombre}</th><th style="text-align:right">Puntos</th>
@@ -1204,7 +1215,7 @@ function renderEdicion(num) {
         <div class="jornada-titulo">Jornada 2 · Individual (Match Play)</div>
         <div class="jornada-score">${e.equipoA?.nombre?.split("'")[0]} ${st.ptIndA} – ${st.ptIndB} ${e.equipoB?.nombre?.split("'")[0]}</div>
       </div>
-      <table class="matches-table">
+      <table class="matches-table" style="--match-color-a:${colorHex(e.equipoA?.color1)};--match-color-b:${colorHex(e.equipoB?.color1)}">
         <thead><tr>
           <th>${e.equipoA?.nombre}</th><th style="text-align:center">Resultado</th>
           <th>${e.equipoB?.nombre}</th><th style="text-align:right">Puntos</th>
