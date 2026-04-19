@@ -979,11 +979,11 @@ function computePlayerStats() {
     }).length;
   });
 
-  // copas = editions won as team member
+  // copas = editions won as team member (no copa on draw)
   D.ediciones.filter(e => e.jugada).forEach(edic => {
     const st = computeEdicionStats(edic.edicion);
-    if (!st) return;
-    const ganadorCod = st.totalA >= st.totalB ? edic.equipoA?.cod : edic.equipoB?.cod;
+    if (!st || st.totalA === st.totalB) return; // empate: nadie suma copa
+    const ganadorCod = st.totalA > st.totalB ? edic.equipoA?.cod : edic.equipoB?.cod;
     D.jugadores.forEach(j => {
       const equipoCod = (j.equipos || {})[edic.edicion];
       if (equipoCod === ganadorCod && stats[j.num]) {
@@ -1156,16 +1156,19 @@ function renderEdicion(num) {
 
   // Header equipos: A siempre izquierda, B siempre derecha
   function eqColHtml(eq, isWinner) {
+    // isWinner: true=ganador, false=perdedor, null=empate
     const bg = eq?.color1 ? colorHex(eq.color1) : (isWinner ? 'var(--verde)' : 'var(--crema)');
     const txt = COLOR_LIGHT.has(eq?.color1) ? 'var(--negro)' : 'white';
-    const borderStyle = isWinner
+    const borderStyle = isWinner === true
       ? 'box-shadow:inset 0 0 0 3px rgba(255,255,255,0.4), 0 4px 20px rgba(0,0,0,0.2);'
-      : 'opacity:0.85;';
-    const badge = isWinner
+      : isWinner === null ? '' : 'opacity:0.85;';
+    const badge = isWinner === true
       ? `<span class="eq-badge campeon" style="background:rgba(255,255,255,0.25);color:${txt==='var(--negro)'?'var(--negro)':'white'};font-size:0.8rem;padding:4px 14px">🏆 Campeón</span>`
+      : isWinner === null
+      ? `<span class="eq-badge subcampeon" style="background:rgba(255,255,255,0.15);color:${txt};font-size:0.72rem">½ Empate</span>`
       : `<span class="eq-badge subcampeon" style="background:rgba(0,0,0,0.1);color:${txt};font-size:0.72rem">Subcampeón</span>`;
-    const nombreSize = isWinner ? '1.7rem' : '1.3rem';
-    const padding = isWinner ? '28px 24px' : '20px 20px';
+    const nombreSize = isWinner === true ? '1.7rem' : '1.3rem';
+    const padding = isWinner === true ? '28px 24px' : '20px 20px';
     return `<div class="eq-col" style="background:${bg};color:${txt};text-align:center;padding:${padding};${borderStyle}">
       ${badge}
       <div class="eq-nombre" style="color:${txt};font-size:${nombreSize};margin-top:8px">${eq?.nombre||'—'}</div>
@@ -1178,11 +1181,12 @@ function renderEdicion(num) {
     <div class="puntos-desglose">Par: ${st.ptParA}–${st.ptParB} · Ind: ${st.ptIndA}–${st.ptIndB}</div>
     <div class="score-fecha">${e.fecha1} · ${e.campo1} / ${e.campo2}</div>`;
 
+  const empate = st.totalA === st.totalB;
   const html = `
     <div class="edicion-header">
-      ${eqColHtml(e.equipoA, ganadorA)}
+      ${eqColHtml(e.equipoA, empate ? null : ganadorA)}
       <div class="eq-col center-score">${scoreHtml}</div>
-      ${eqColHtml(e.equipoB, !ganadorA)}
+      ${eqColHtml(e.equipoB, empate ? null : !ganadorA)}
     </div>
 
     <div class="jornada-section">
@@ -1228,9 +1232,41 @@ function buildMerito() {
 
   D.ediciones.filter(e => e.jugada && D.individuales.some(r=>r.edicion===e.edicion)).forEach(e => {
     const st = computeEdicionStats(e.edicion);
-    const ganA = st.totalA >= st.totalB;
-    const campeon = ganA ? e.equipoA : e.equipoB;
-    const subcampeon = ganA ? e.equipoB : e.equipoA;
+    const empate = st.totalA === st.totalB;
+    const ganA = st.totalA > st.totalB;
+    const campeon   = !empate ? (ganA ? e.equipoA : e.equipoB) : null;
+    const subcampeon = !empate ? (ganA ? e.equipoB : e.equipoA) : null;
+
+    if (empate) {
+      const bgA = e.equipoA?.color1 ? colorHex(e.equipoA.color1) : 'var(--verde)';
+      const txtA = COLOR_LIGHT.has(e.equipoA?.color1) ? 'var(--negro)' : 'white';
+      const bgB = e.equipoB?.color1 ? colorHex(e.equipoB.color1) : 'var(--crema)';
+      const txtB = COLOR_LIGHT.has(e.equipoB?.color1) ? 'var(--negro)' : 'white';
+      rows.push(`
+        <tr>
+          <td class="om-año" rowspan="2" style="border-left:5px solid var(--gris)">${e.año}</td>
+          <td rowspan="2" style="color:var(--gris);font-family:'Barlow Condensed'">Ed. ${e.edicion}</td>
+          <td style="background:color-mix(in srgb,${bgA} 30%,transparent)">
+            <span style="font-family:'Barlow Condensed';font-size:0.7rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gris)">½ Empate</span>
+          </td>
+          <td class="om-equipo" style="color:var(--negro)">${e.equipoA?.nombre||'—'}</td>
+          <td class="om-pts" style="color:var(--gris)">${st.ptParA}</td>
+          <td class="om-pts" style="color:var(--gris)">${st.ptIndA}</td>
+          <td class="om-pts" style="color:var(--gris)">${st.totalA}</td>
+        </tr>
+        <tr>
+          <td style="background:color-mix(in srgb,${bgB} 30%,transparent)">
+            <span style="font-family:'Barlow Condensed';font-size:0.7rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gris)">½ Empate</span>
+          </td>
+          <td class="om-equipo" style="color:var(--negro)">${e.equipoB?.nombre||'—'}</td>
+          <td class="om-pts" style="color:var(--gris)">${st.ptParB}</td>
+          <td class="om-pts" style="color:var(--gris)">${st.ptIndB}</td>
+          <td class="om-pts" style="color:var(--gris)">${st.totalB}</td>
+        </tr>
+      `);
+      return;
+    }
+
     const ptC = ganA ? st.totalA : st.totalB;
     const ptS = ganA ? st.totalB : st.totalA;
     const ptParC = ganA ? st.ptParA : st.ptParB;
@@ -1238,7 +1274,6 @@ function buildMerito() {
     const ptIndC = ganA ? st.ptIndA : st.ptIndB;
     const ptIndS = ganA ? st.ptIndB : st.ptIndA;
 
-    // Colores del equipo campeón y subcampeón
     const bgC = campeon?.color1 ? colorHex(campeon.color1) : 'var(--verde)';
     const txtC = COLOR_LIGHT.has(campeon?.color1) ? 'var(--negro)' : 'white';
     const bgS = subcampeon?.color1 ? colorHex(subcampeon.color1) : 'transparent';
