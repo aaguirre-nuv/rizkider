@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rizkider Cup — Izki-Urturi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Barlow+Condensed:wght@300;400;500;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --verde: #1B5229;
+  --verde-medio: #2D7A3A;
+  --verde-claro: #4A9957;
+  --oro: #C8960C;
+  --oro-claro: #E8B820;
+  --oro-vivo: #F0C840;
+  --blanco: #FAFAF6;
+  --crema: #F2EFE6;
+  --gris-claro: #E4E9E5;
+  --gris: #8A9E90;
+  --negro: #0D1A0F;
+  --sombra: rgba(13,26,15,0.15);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Barlow', sans-serif;
+  background: var(--crema);
+  color: var(--negro);
+  min-height: 100vh;
+}
+
+/* ── HEADER ── */
+header {
+  background: var(--verde);
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+}
+.header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 10px 24px;
+}
+.header-logo { height: 56px; width: auto; cursor: pointer; }
+.header-title {
+  font-family: 'Playfair Display', serif;
+  color: var(--blanco);
+  font-size: 1.4rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+.header-title span { color: var(--oro-vivo); }
+nav {
+  margin-left: auto;
+  display: flex;
+  gap: 4px;
+}
+nav button {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.7);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 8px 14px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+nav button:hover, nav button.active {
+  background: rgba(255,255,255,0.12);
+  color: var(--oro-vivo);
+}
+
+/* ── MAIN ── */
+main { max-width: 1100px; margin: 0 auto; padding: 32px 24px 64px; }
+
+/* ── SECCIONES ── */
+.seccion { display: none; }
+.seccion.activa { display: block; }
+
+/* ── HOME ── */
+.home-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-bottom: 40px;
+}
+.hero-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.hero-tagline {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--oro);
+  margin-bottom: 12px;
+}
+.hero-titulo {
+  font-family: 'Playfair Display', serif;
+  font-size: 3.2rem;
+  font-weight: 900;
+  color: var(--verde);
+  line-height: 1.0;
+  margin-bottom: 8px;
+}
+.hero-titulo span { color: var(--oro); }
+.hero-subtitulo {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.1rem;
+  color: var(--gris);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  margin-bottom: 24px;
+}
+.hero-logo-wrap { text-align: center; padding: 16px; }
+.hero-logo-wrap img { width: 220px; height: auto; }
+
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 40px;
+}
+.stat-card {
+  background: var(--verde);
+  border-radius: 8px;
+  padding: 20px 16px;
+  text-align: center;
+  color: white;
+}
+.stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.4rem;
+  font-weight: 900;
+  color: var(--oro-vivo);
+  line-height: 1;
+}
+.stat-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+  margin-top: 4px;
+}
+
+.ultima-edicion {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px var(--sombra);
+  margin-bottom: 40px;
+}
+.ue-header {
+  background: var(--verde);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ue-header h3 {
+  font-family: 'Playfair Display', serif;
+  color: white;
+  font-size: 1.1rem;
+}
+.ue-header .badge {
+  background: var(--oro);
+  color: var(--negro);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+.ue-body { padding: 24px; }
+.match-scoreboard {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 16px;
+  align-items: center;
+  text-align: center;
+}
+.team-block { padding: 16px; }
+.team-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--verde);
+  margin-bottom: 4px;
+}
+.team-result {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.team-result.campeon { color: var(--oro); }
+.team-result.subcampeon { color: var(--gris); }
+.score-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.score-vs {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: var(--verde);
+  line-height: 1;
+}
+.score-vs span { color: var(--gris); font-size: 1.2rem; margin: 0 6px; }
+.score-detail {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.75rem;
+  color: var(--gris);
+  letter-spacing: 0.05em;
+}
+.btn-ver-edicion {
+  display: inline-block;
+  margin-top: 16px;
+  background: var(--verde);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-ver-edicion:hover { background: var(--verde-medio); }
+
+/* ── EDICIONES ── */
+.year-timeline {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+.year-btn {
+  background: white;
+  border: 2px solid var(--gris-claro);
+  color: var(--gris);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.03em;
+}
+.year-btn:hover {
+  border-color: var(--verde-claro);
+  color: var(--verde);
+}
+.year-btn.activo {
+  background: var(--verde);
+  border-color: var(--verde);
+  color: var(--oro-vivo);
+}
+.year-btn.no-jugada {
+  opacity: 0.4;
+  cursor: default;
+  text-decoration: line-through;
+}
+
+.edicion-detalle { display: none; }
+.edicion-detalle.visible { display: block; }
+
+.edicion-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px var(--sombra);
+  margin-bottom: 24px;
+}
+.eq-col {
+  padding: 24px 20px;
+  text-align: center;
+}
+.eq-col.ganador { background: var(--verde); color: white; }
+.eq-col.perdedor { background: var(--crema); }
+.eq-col.center-score {
+  background: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  border-left: 1px solid var(--gris-claro);
+  border-right: 1px solid var(--gris-claro);
+}
+.eq-badge {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  display: inline-block;
+}
+.eq-badge.campeon { background: var(--oro-vivo); color: var(--negro); }
+.eq-badge.subcampeon { background: var(--gris-claro); color: var(--gris); }
+.eq-nombre {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.eq-col.ganador .eq-nombre { color: white; }
+.eq-col.perdedor .eq-nombre { color: var(--verde); }
+.eq-colores {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 8px;
+}
+.color-chip {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+.score-big {
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--verde);
+  line-height: 1;
+}
+.score-separador {
+  font-size: 1.5rem;
+  color: var(--gris);
+  font-family: 'Playfair Display', serif;
+  margin: 0 6px;
+}
+.score-fecha {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.8rem;
+  color: var(--gris);
+  letter-spacing: 0.05em;
+  text-align: center;
+  margin-top: 8px;
+}
+.puntos-desglose {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.8rem;
+  color: var(--gris);
+  margin-top: 6px;
+}
+
+.jornada-section {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px var(--sombra);
+  margin-bottom: 20px;
+}
+.jornada-header {
+  background: var(--verde);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.jornada-titulo {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--oro-vivo);
+}
+.jornada-score {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  color: white;
+  font-weight: 700;
+}
+
+table.matches-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+table.matches-table th {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gris);
+  padding: 10px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--gris-claro);
+  background: var(--crema);
+}
+table.matches-table td {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.9rem;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--gris-claro);
+}
+table.matches-table tr:last-child td { border-bottom: none; }
+table.matches-table tr.ganador-A td { background: rgba(27,82,41,0.04); }
+table.matches-table tr.ganador-B td { background: rgba(200,150,12,0.04); }
+.resultado-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.05em;
+}
+.pill-A { background: var(--verde); color: white; }
+.pill-B { background: var(--oro); color: var(--negro); }
+.pill-E { background: var(--gris-claro); color: var(--gris); }
+.pts-cell { font-weight: 700; color: var(--verde); }
+
+/* ── ORDEN DE MERITO ── */
+.om-table-wrap {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px var(--sombra);
+}
+table.om-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+table.om-table th {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gris);
+  padding: 12px 20px;
+  text-align: left;
+  background: var(--crema);
+  border-bottom: 1px solid var(--gris-claro);
+}
+table.om-table td {
+  padding: 12px 20px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.95rem;
+  border-bottom: 1px solid var(--gris-claro);
+}
+table.om-table tr:last-child td { border-bottom: none; }
+table.om-table tr.row-campeon td { background: rgba(27,82,41,0.05); }
+table.om-table tr.row-subcampeon td { background: rgba(200,150,12,0.03); }
+.om-año {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  color: var(--verde);
+  font-size: 1.05rem;
+}
+.om-equipo { font-weight: 600; }
+.om-pts { font-weight: 700; color: var(--verde); }
+
+/* ── JUGADORES ── */
+.jugador-search-wrap { margin-bottom: 24px; }
+.jugador-select {
+  width: 100%;
+  max-width: 320px;
+  padding: 10px 14px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1rem;
+  border: 2px solid var(--gris-claro);
+  border-radius: 8px;
+  color: var(--negro);
+  background: white;
+  cursor: pointer;
+  outline: none;
+}
+.jugador-select:focus { border-color: var(--verde); }
+
+.jugador-ficha { display: none; }
+.jugador-ficha.visible { display: block; }
+
+.ficha-header {
+  background: var(--verde);
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 24px;
+  align-items: center;
+  box-shadow: 0 2px 12px var(--sombra);
+}
+.ficha-nombre {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 900;
+  color: white;
+  margin-bottom: 4px;
+}
+.ficha-record {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1rem;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 0.05em;
+}
+.ficha-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 80px);
+  gap: 12px;
+}
+.ficha-stat {
+  text-align: center;
+  background: rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 10px;
+}
+.ficha-stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--oro-vivo);
+  line-height: 1;
+}
+.ficha-stat-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+  margin-top: 3px;
+}
+
+.ficha-tabla-wrap {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px var(--sombra);
+}
+.ficha-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--gris-claro);
+  background: var(--crema);
+}
+.ficha-tab {
+  padding: 12px 20px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gris);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.15s;
+}
+.ficha-tab.activo {
+  color: var(--verde);
+  border-bottom-color: var(--verde);
+}
+
+/* ── RANKINGS ── */
+.rankings-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.ranking-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px var(--sombra);
+}
+.ranking-header {
+  background: var(--verde);
+  padding: 14px 20px;
+}
+.ranking-titulo {
+  font-family: 'Playfair Display', serif;
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.ranking-subtitulo {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+table.ranking-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+table.ranking-table td {
+  padding: 9px 16px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.9rem;
+  border-bottom: 1px solid var(--gris-claro);
+}
+table.ranking-table tr:last-child td { border-bottom: none; }
+.rank-pos {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  color: var(--gris);
+  width: 32px;
+  font-size: 1rem;
+}
+.rank-pos.top3 { color: var(--oro); }
+.rank-nombre { font-weight: 500; flex: 1; }
+.rank-valor { font-weight: 700; color: var(--verde); text-align: right; }
+
+/* ── SECTION TITLE ── */
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--verde);
+  margin-bottom: 8px;
+}
+.section-title span { color: var(--oro); }
+.section-subtitle {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.9rem;
+  color: var(--gris);
+  letter-spacing: 0.05em;
+  margin-bottom: 28px;
+}
+
+/* ── UTILITIES ── */
+.color-oro { color: var(--oro); }
+.bold { font-weight: 700; }
+
+@media (max-width: 700px) {
+  .home-hero { grid-template-columns: 1fr; }
+  .stats-bar { grid-template-columns: repeat(2, 1fr); }
+  .rankings-grid { grid-template-columns: 1fr; }
+  .edicion-header { grid-template-columns: 1fr; }
+  .eq-col.center-score { border: none; border-top: 1px solid var(--gris-claro); border-bottom: 1px solid var(--gris-claro); }
+  nav button span { display: none; }
+  .ficha-header { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <img class="header-logo" src="logo.png" alt="Rizkider Cup" onclick="showSection('home')">
+    <div class="header-title" onclick="showSection('home')"><span>RIZKI</span>DER CUP</div>
+    <nav>
+      <button onclick="showSection('home')" id="nav-home">Inicio</button>
+      <button onclick="showSection('ediciones')" id="nav-ediciones">Ediciones</button>
+      <button onclick="showSection('merito')" id="nav-merito">Palmarés</button>
+      <button onclick="showSection('jugadores')" id="nav-jugadores">Jugadores</button>
+      <button onclick="showSection('rankings')" id="nav-rankings">Rankings</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- HOME -->
+  <section id="sec-home" class="seccion">
+    <div class="home-hero">
+      <div class="hero-left">
+        <div class="hero-tagline">Izki · Urturi · Álava</div>
+        <h1 class="hero-titulo"><span>Rizki</span>der<br>Cup</h1>
+        <p class="hero-subtitulo">La competición entre amigos<br>desde 2007 en Izki-Urturi</p>
+        <button class="btn-ver-edicion" onclick="showSection('ediciones')">Ver todas las ediciones →</button>
+      </div>
+      <div class="hero-logo-wrap">
+        <img src="logo.png" alt="Rizkider Cup">
+      </div>
+    </div>
+
+    <div class="stats-bar" id="home-stats"></div>
+    <div class="ultima-edicion" id="home-ultima"></div>
+  </section>
+
+  <!-- EDICIONES -->
+  <section id="sec-ediciones" class="seccion">
+    <h2 class="section-title"><span>Ediciones</span></h2>
+    <p class="section-subtitle">19 ediciones · 2007 — 2025</p>
+    <div class="year-timeline" id="year-timeline"></div>
+    <div class="edicion-detalle" id="edicion-detalle"></div>
+  </section>
+
+  <!-- ORDEN MÉRITO -->
+  <section id="sec-merito" class="seccion">
+    <h2 class="section-title"><span>Palmarés</span></h2>
+    <p class="section-subtitle">Campeones y subcampeones por edición</p>
+    <div class="om-table-wrap">
+      <table class="om-table">
+        <thead>
+          <tr>
+            <th>Año</th>
+            <th>Edición</th>
+            <th></th>
+            <th>Equipo</th>
+            <th>Pts Parejas</th>
+            <th>Pts Individual</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody id="om-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- JUGADORES -->
+  <section id="sec-jugadores" class="seccion">
+    <h2 class="section-title"><span>Jugadores</span></h2>
+    <p class="section-subtitle">Estadísticas históricas por jugador</p>
+    <div class="jugador-search-wrap">
+      <select class="jugador-select" id="jugador-select" onchange="mostrarJugador(this.value)">
+        <option value="">— Selecciona un jugador —</option>
+      </select>
+    </div>
+    <div class="jugador-ficha" id="jugador-ficha"></div>
+  </section>
+
+  <!-- RANKINGS -->
+  <section id="sec-rankings" class="seccion">
+    <h2 class="section-title"><span>Rankings</span></h2>
+    <p class="section-subtitle">Top 10 por distintas métricas — todos los tiempos</p>
+    <div class="rankings-grid" id="rankings-grid"></div>
+  </section>
+
+</main>
+
+<script>
+// ═══════════════════════════════════════════════
+// DATA — embedded inline
+// ═══════════════════════════════════════════════
+const DATA_URL = 'data.json';
+let D = null; // will hold parsed data
+
+// Color map
+const COLOR_MAP = {
+  'Blanco': '#FFFFFF', 'Azul': '#2563EB', 'Amarillo': '#F59E0B',
+  'Rojo': '#DC2626', 'Verde': '#16A34A', 'Rosa': '#EC4899',
+  'Morado': '#7C3AED', 'Naranja': '#EA580C', 'Gris': '#6B7280',
+  'Negro': '#1F2937', 'Marrón': '#92400E', 'Turquesa': '#0D9488',
+};
+function colorHex(name) {
+  if (!name) return '#cccccc';
+  return COLOR_MAP[name] || '#cccccc';
+}
+
+// ═══════════════════════════════════════════════
+// STATS COMPUTATION
+// ═══════════════════════════════════════════════
+function computeEdicionStats(edic) {
+  const ind = D.individuales.filter(r => r.edicion === edic);
+  const par = D.parejas.filter(r => r.edicion === edic);
+  const e = D.ediciones.find(e => e.edicion === edic);
+  if (!e) return null;
+
+  const codA = e.equipoA?.cod;
+  const codB = e.equipoB?.cod;
+
+  let ptParA=0, ptParB=0, ptIndA=0, ptIndB=0;
+
+  par.forEach(r => {
+    if (r.equipoA === codA) { ptParA += r.ptosA||0; ptParB += r.ptosB||0; }
+    else { ptParB += r.ptosA||0; ptParA += r.ptosB||0; }
+  });
+  ind.forEach(r => {
+    if (r.jugA_equipo === codA) { ptIndA += r.ptosA||0; ptIndB += r.ptosB||0; }
+    else { ptIndB += r.ptosA||0; ptIndA += r.ptosB||0; }
+  });
+
+  return { ptParA, ptParB, ptIndA, ptIndB, totalA: ptParA+ptIndA, totalB: ptParB+ptIndB };
+}
+
+function computePlayerStats() {
+  const stats = {};
+  D.jugadores.forEach(j => {
+    stats[j.num] = {
+      num: j.num, mote: j.mote, nombre: j.nombre,
+      ediciones: 0, ryders: 0, pts: 0, ptsInd: 0, ptsPar: 0,
+      ganados: 0, empatados: 0, perdidos: 0,
+      ganInd: 0, ganPar: 0, perInd: 0, perPar: 0,
+    };
+  });
+
+  D.individuales.forEach(r => {
+    [r.jugA, r.jugB].forEach((num, idx) => {
+      if (!num || !stats[num]) return;
+      const s = stats[num];
+      const pts = idx === 0 ? (r.ptosA||0) : (r.ptosB||0);
+      const rdo = idx === 0 ? r.rdoA : -r.rdoA;
+      s.pts += pts;
+      s.ptsInd += pts;
+      s.ryders++;
+      if (rdo > 0) { s.ganados++; s.ganInd++; }
+      else if (rdo === 0) s.empatados++;
+      else { s.perdidos++; s.perInd++; }
+    });
+  });
+
+  D.parejas.forEach(r => {
+    [[r.jug1A, r.jug2A, 'A'], [r.jug1B, r.jug2B, 'B']].forEach(([n1,n2,side]) => {
+      [n1,n2].forEach(num => {
+        if (!num || !stats[num]) return;
+        const s = stats[num];
+        const pts = side === 'A' ? (r.ptosA||0) : (r.ptosB||0);
+        const rdo = side === 'A' ? r.rdoA : -r.rdoA;
+        s.pts += pts;
+        s.ptsPar += pts;
+        s.ryders++;
+        if (rdo > 0) { s.ganados++; s.ganPar++; }
+        else if (rdo === 0) s.empatados++;
+        else { s.perdidos++; s.perPar++; }
+      });
+    });
+  });
+
+  // count editions per player
+  D.jugadores.forEach(j => {
+    const equipos = j.equipos || {};
+    stats[j.num].ediciones = Object.keys(equipos).filter(k => {
+      const edic = D.ediciones.find(e => e.edicion === parseInt(k));
+      return edic && edic.jugada;
+    }).length;
+  });
+
+  return stats;
+}
+
+// ═══════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════
+let currentSection = 'home';
+function showSection(id) {
+  document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-'+id)?.classList.add('activa');
+  document.getElementById('nav-'+id)?.classList.add('active');
+  currentSection = id;
+  if (id === 'ediciones' && !document.querySelector('.year-btn.activo')) {
+    selectEdicion(18); // default 2024
+  }
+}
+
+// ═══════════════════════════════════════════════
+// HOME
+// ═══════════════════════════════════════════════
+function buildHome() {
+  const pstats = computePlayerStats();
+  const jugados = D.ediciones.filter(e => e.jugada).length;
+  const totalJugadores = Object.values(pstats).filter(s => s.ryders > 0).length;
+  const totalPartidos = D.individuales.length + D.parejas.length;
+
+  document.getElementById('home-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${jugados}</div><div class="stat-label">Ediciones</div></div>
+    <div class="stat-card"><div class="stat-num">${totalJugadores}</div><div class="stat-label">Jugadores</div></div>
+    <div class="stat-card"><div class="stat-num">${totalPartidos}</div><div class="stat-label">Partidos</div></div>
+    <div class="stat-card"><div class="stat-num">2007</div><div class="stat-label">Primera edición</div></div>
+  `;
+
+  // Última edición jugada
+  const ultima = [...D.ediciones].reverse().find(e => e.jugada && D.individuales.some(r=>r.edicion===e.edicion));
+  if (ultima) {
+    const st = computeEdicionStats(ultima.edicion);
+    const ganadorNombre = st.totalA >= st.totalB ? ultima.equipoA?.nombre : ultima.equipoB?.nombre;
+    const perdedorNombre = st.totalA >= st.totalB ? ultima.equipoB?.nombre : ultima.equipoA?.nombre;
+    const ptGan = Math.max(st.totalA, st.totalB);
+    const ptPerd = Math.min(st.totalA, st.totalB);
+
+    document.getElementById('home-ultima').innerHTML = `
+      <div class="ue-header">
+        <h3>Última edición — ${ultima.año}</h3>
+        <span class="badge">Edición ${ultima.edicion}</span>
+      </div>
+      <div class="ue-body">
+        <div class="match-scoreboard">
+          <div class="team-block">
+            <div class="team-name">${ganadorNombre}</div>
+            <div class="team-result campeon">🏆 Campeón</div>
+          </div>
+          <div class="score-center">
+            <div class="score-vs">${ptGan}<span>–</span>${ptPerd}</div>
+            <div class="score-detail">Parejas + Individual</div>
+          </div>
+          <div class="team-block">
+            <div class="team-name">${perdedorNombre}</div>
+            <div class="team-result subcampeon">Subcampeón</div>
+          </div>
+        </div>
+        <div style="text-align:center; margin-top:16px;">
+          <button class="btn-ver-edicion" onclick="selectEdicion(${ultima.edicion}); showSection('ediciones')">Ver detalle completo →</button>
+        </div>
+      </div>
+    `;
+  }
+}
+
+// ═══════════════════════════════════════════════
+// TIMELINE
+// ═══════════════════════════════════════════════
+function buildTimeline() {
+  const wrap = document.getElementById('year-timeline');
+  wrap.innerHTML = D.ediciones.map(e => `
+    <button class="year-btn ${!e.jugada ? 'no-jugada' : ''}" 
+            id="ybtn-${e.edicion}"
+            onclick="${e.jugada ? `selectEdicion(${e.edicion})` : ''}"
+            title="${!e.jugada ? 'No celebrada (COVID)' : e.equipoA?.nombre + ' vs ' + e.equipoB?.nombre}">
+      ${e.año}
+    </button>
+  `).join('');
+}
+
+function selectEdicion(num) {
+  document.querySelectorAll('.year-btn').forEach(b => b.classList.remove('activo'));
+  document.getElementById('ybtn-'+num)?.classList.add('activo');
+  renderEdicion(num);
+}
+
+// ═══════════════════════════════════════════════
+// EDICION DETAIL
+// ═══════════════════════════════════════════════
+function renderEdicion(num) {
+  const e = D.ediciones.find(e => e.edicion === num);
+  if (!e || !e.jugada) return;
+
+  const st = computeEdicionStats(num);
+  const codA = e.equipoA?.cod;
+  const codB = e.equipoB?.cod;
+
+  const ganadorA = st.totalA >= st.totalB;
+  const ganadorClass = (isA) => isA === ganadorA ? 'ganador' : 'perdedor';
+  const badgeHtml = (isA) => {
+    const winner = isA === ganadorA;
+    return `<span class="eq-badge ${winner ? 'campeon' : 'subcampeon'}">${winner ? '🏆 Campeón' : 'Subcampeón'}</span>`;
+  };
+
+  function coloresHtml(eq) {
+    if (!eq?.color1 && !eq?.color2) return '';
+    return `<div class="eq-colores">
+      ${eq.color1 ? `<div class="color-chip" style="background:${colorHex(eq.color1)}" title="${eq.color1}"></div>` : ''}
+      ${eq.color2 ? `<div class="color-chip" style="background:${colorHex(eq.color2)}" title="${eq.color2}"></div>` : ''}
+    </div>`;
+  }
+
+  // Parejas jornada 1
+  const parJ1 = D.parejas.filter(r => r.edicion === num);
+  // Individual jornada 2
+  const indJ2 = D.individuales.filter(r => r.edicion === num);
+
+  function matchRowParejas(r) {
+    const eqAisA = r.equipoA === codA;
+    const moteA = `${r.jug1A_mote} & ${r.jug2A_mote}`;
+    const moteB = `${r.jug1B_mote} & ${r.jug2B_mote}`;
+    // Normalize: show team A (of edition) on left
+    const [leftName, rightName, rdo, ptL, ptR] = eqAisA
+      ? [moteA, moteB, r.rdoA, r.ptosA, r.ptosB]
+      : [moteB, moteA, -r.rdoA, r.ptosB, r.ptosA];
+    const rowClass = rdo > 0 ? 'ganador-A' : rdo < 0 ? 'ganador-B' : '';
+    const pill = rdo > 0 ? '<span class="resultado-pill pill-A">1</span>' : rdo < 0 ? '<span class="resultado-pill pill-B">1</span>' : '<span class="resultado-pill pill-E">½</span>';
+    return `<tr class="${rowClass}">
+      <td class="bold">${leftName}</td>
+      <td style="text-align:center">${pill}</td>
+      <td>${rightName}</td>
+      <td class="pts-cell" style="text-align:right">${ptL||0} – ${ptR||0}</td>
+    </tr>`;
+  }
+
+  function matchRowIndividual(r) {
+    const eqAisA = r.jugA_equipo === codA;
+    const [leftName, rightName, rdo, ptL, ptR] = eqAisA
+      ? [r.jugA_mote, r.jugB_mote, r.rdoA, r.ptosA, r.ptosB]
+      : [r.jugB_mote, r.jugA_mote, -r.rdoA, r.ptosB, r.ptosA];
+    const rowClass = rdo > 0 ? 'ganador-A' : rdo < 0 ? 'ganador-B' : '';
+    const pill = rdo > 0 ? '<span class="resultado-pill pill-A">1</span>' : rdo < 0 ? '<span class="resultado-pill pill-B">1</span>' : '<span class="resultado-pill pill-E">½</span>';
+    return `<tr class="${rowClass}">
+      <td class="bold">${leftName||'—'}</td>
+      <td style="text-align:center">${pill}</td>
+      <td>${rightName||'—'}</td>
+      <td class="pts-cell" style="text-align:right">${ptL||0} – ${ptR||0}</td>
+    </tr>`;
+  }
+
+  const scoreHtml = `<div class="score-big">${st.totalA.toFixed(1)}<span class="score-separador"> – </span>${st.totalB.toFixed(1)}</div>
+    <div class="puntos-desglose">Par: ${st.ptParA}–${st.ptParB} · Ind: ${st.ptIndA}–${st.ptIndB}</div>
+    <div class="score-fecha">${e.fecha1} · ${e.campo1} / ${e.campo2}</div>`;
+
+  const html = `
+    <div class="edicion-header">
+      <div class="eq-col ${ganadorClass(true)}">
+        ${badgeHtml(true)}
+        <div class="eq-nombre">${e.equipoA?.nombre || '—'}</div>
+        ${coloresHtml(e.equipoA)}
+        ${e.equipoA?.capitan ? `<div style="font-family:'Barlow Condensed';font-size:0.8rem;margin-top:8px;opacity:0.7">Cap: ${e.equipoA.capitan}</div>` : ''}
+      </div>
+      <div class="eq-col center-score">${scoreHtml}</div>
+      <div class="eq-col ${ganadorClass(false)}">
+        ${badgeHtml(false)}
+        <div class="eq-nombre">${e.equipoB?.nombre || '—'}</div>
+        ${coloresHtml(e.equipoB)}
+        ${e.equipoB?.capitan ? `<div style="font-family:'Barlow Condensed';font-size:0.8rem;margin-top:8px;opacity:0.7">Cap: ${e.equipoB.capitan}</div>` : ''}
+      </div>
+    </div>
+
+    <div class="jornada-section">
+      <div class="jornada-header">
+        <div class="jornada-titulo">Jornada 1 · Parejas (Greensome Chapman)</div>
+        <div class="jornada-score">${e.equipoA?.nombre?.split("'")[0]} ${st.ptParA} – ${st.ptParB} ${e.equipoB?.nombre?.split("'")[0]}</div>
+      </div>
+      <table class="matches-table">
+        <thead><tr>
+          <th>${e.equipoA?.nombre}</th><th style="text-align:center">Rdo</th>
+          <th>${e.equipoB?.nombre}</th><th style="text-align:right">Puntos</th>
+        </tr></thead>
+        <tbody>${parJ1.map(matchRowParejas).join('')}</tbody>
+      </table>
+    </div>
+
+    <div class="jornada-section">
+      <div class="jornada-header">
+        <div class="jornada-titulo">Jornada 2 · Individual (Match Play)</div>
+        <div class="jornada-score">${e.equipoA?.nombre?.split("'")[0]} ${st.ptIndA} – ${st.ptIndB} ${e.equipoB?.nombre?.split("'")[0]}</div>
+      </div>
+      <table class="matches-table">
+        <thead><tr>
+          <th>${e.equipoA?.nombre}</th><th style="text-align:center">Rdo</th>
+          <th>${e.equipoB?.nombre}</th><th style="text-align:right">Puntos</th>
+        </tr></thead>
+        <tbody>${indJ2.map(matchRowIndividual).join('')}</tbody>
+      </table>
+    </div>
+  `;
+
+  const det = document.getElementById('edicion-detalle');
+  det.innerHTML = html;
+  det.classList.add('visible');
+}
+
+// ═══════════════════════════════════════════════
+// ORDEN MÉRITOS
+// ═══════════════════════════════════════════════
+function buildMerito() {
+  const tbody = document.getElementById('om-tbody');
+  const rows = [];
+
+  D.ediciones.filter(e => e.jugada && D.individuales.some(r=>r.edicion===e.edicion)).forEach(e => {
+    const st = computeEdicionStats(e.edicion);
+    const ganA = st.totalA >= st.totalB;
+    const campeon = ganA ? e.equipoA : e.equipoB;
+    const subcampeon = ganA ? e.equipoB : e.equipoA;
+    const ptC = ganA ? st.totalA : st.totalB;
+    const ptS = ganA ? st.totalB : st.totalA;
+    const ptParC = ganA ? st.ptParA : st.ptParB;
+    const ptParS = ganA ? st.ptParB : st.ptParA;
+    const ptIndC = ganA ? st.ptIndA : st.ptIndB;
+    const ptIndS = ganA ? st.ptIndB : st.ptIndA;
+
+    rows.push(`
+      <tr class="row-campeon">
+        <td class="om-año" rowspan="2">${e.año}</td>
+        <td rowspan="2" style="color:var(--gris);font-family:'Barlow Condensed'">Ed. ${e.edicion}</td>
+        <td><span class="resultado-pill pill-A">🏆</span></td>
+        <td class="om-equipo">${campeon?.nombre||'—'}</td>
+        <td class="om-pts">${ptParC}</td>
+        <td class="om-pts">${ptIndC}</td>
+        <td class="om-pts">${ptC}</td>
+      </tr>
+      <tr class="row-subcampeon">
+        <td><span class="resultado-pill pill-E" style="opacity:0.6">2º</span></td>
+        <td class="om-equipo" style="color:var(--gris)">${subcampeon?.nombre||'—'}</td>
+        <td style="color:var(--gris)">${ptParS}</td>
+        <td style="color:var(--gris)">${ptIndS}</td>
+        <td style="color:var(--gris)">${ptS}</td>
+      </tr>
+    `);
+  });
+
+  tbody.innerHTML = rows.reverse().join('');
+}
+
+// ═══════════════════════════════════════════════
+// JUGADORES
+// ═══════════════════════════════════════════════
+function buildJugadoresSelect() {
+  const pstats = computePlayerStats();
+  const sel = document.getElementById('jugador-select');
+  const sorted = D.jugadores
+    .filter(j => pstats[j.num]?.ryders > 0)
+    .sort((a,b) => a.mote.localeCompare(b.mote));
+
+  sel.innerHTML = '<option value="">— Selecciona un jugador —</option>' +
+    sorted.map(j => `<option value="${j.num}">${j.mote} (${j.nombre})</option>`).join('');
+}
+
+function mostrarJugador(num) {
+  if (!num) { document.getElementById('jugador-ficha').classList.remove('visible'); return; }
+  num = parseInt(num);
+  const j = D.jugadores.find(x => x.num === num);
+  if (!j) return;
+
+  const pstats = computePlayerStats();
+  const s = pstats[num];
+  const pct = s.ryders > 0 ? ((s.ganados + s.empatados*0.5) / s.ryders * 100).toFixed(0) : 0;
+
+  // Edition history
+  const edicsJugados = Object.entries(j.equipos||{})
+    .filter(([k]) => {
+      const edic = D.ediciones.find(e => e.edicion === parseInt(k));
+      return edic && edic.jugada;
+    })
+    .sort((a,b) => parseInt(b[0])-parseInt(a[0]));
+
+  const histRows = edicsJugados.map(([edic_num, equipo_cod]) => {
+    const edic = D.ediciones.find(e => e.edicion === parseInt(edic_num));
+    if (!edic) return '';
+    const eq = equipo_cod.endsWith('-A') ? edic.equipoA : edic.equipoB;
+    const eqRival = equipo_cod.endsWith('-A') ? edic.equipoB : edic.equipoA;
+    const st = computeEdicionStats(parseInt(edic_num));
+    const codA = edic.equipoA?.cod;
+    const miEsA = equipo_cod === codA;
+    const miPts = miEsA ? st.totalA : st.totalB;
+    const rivPts = miEsA ? st.totalB : st.totalA;
+    const gane = miPts > rivPts ? '🏆' : miPts === rivPts ? '½' : '';
+
+    // individual matches this player
+    const misInd = D.individuales.filter(r => r.edicion === parseInt(edic_num) && (r.jugA === num || r.jugB === num));
+    const misPar = D.parejas.filter(r => r.edicion === parseInt(edic_num) && (r.jug1A === num || r.jug2A === num || r.jug1B === num || r.jug2B === num));
+
+    let ptsJ = 0;
+    misInd.forEach(r => { ptsJ += r.jugA === num ? (r.ptosA||0) : (r.ptosB||0); });
+    misPar.forEach(r => {
+      if (r.jug1A === num || r.jug2A === num) ptsJ += r.ptosA||0;
+      else ptsJ += r.ptosB||0;
+    });
+
+    return `<tr>
+      <td><span class="om-año">${edic.año}</span></td>
+      <td>${eq?.nombre||'—'}</td>
+      <td style="color:var(--gris)">${eqRival?.nombre||'—'}</td>
+      <td style="text-align:center">${gane}</td>
+      <td style="text-align:center;font-weight:600">${ptsJ}</td>
+      <td style="text-align:center">${misInd.length}</td>
+      <td style="text-align:center">${misPar.length}</td>
+    </tr>`;
+  }).join('');
+
+  const fichaHtml = `
+    <div class="ficha-header">
+      <div>
+        <div class="ficha-nombre">${j.mote}</div>
+        <div style="color:rgba(255,255,255,0.5);font-family:'Barlow Condensed';font-size:0.9rem;margin-bottom:8px">${j.nombre}</div>
+        <div class="ficha-record">${s.ganados}g · ${s.empatados}e · ${s.perdidos}p · ${pct}% victorias</div>
+      </div>
+      <div class="ficha-stats">
+        <div class="ficha-stat"><div class="ficha-stat-num">${s.ediciones}</div><div class="ficha-stat-label">Ediciones</div></div>
+        <div class="ficha-stat"><div class="ficha-stat-num">${s.ganados}</div><div class="ficha-stat-label">Ryders gan.</div></div>
+        <div class="ficha-stat"><div class="ficha-stat-num">${s.pts}</div><div class="ficha-stat-label">Puntos</div></div>
+      </div>
+    </div>
+    <div class="ficha-tabla-wrap">
+      <div class="ficha-tabs">
+        <div class="ficha-tab activo">Historial por edición</div>
+      </div>
+      <table class="matches-table" style="margin:0">
+        <thead><tr>
+          <th>Año</th><th>Equipo</th><th>Rival</th><th style="text-align:center">Copa</th>
+          <th style="text-align:center">Pts</th><th style="text-align:center">Ind</th><th style="text-align:center">Par</th>
+        </tr></thead>
+        <tbody>${histRows}</tbody>
+      </table>
+    </div>
+  `;
+
+  const ficha = document.getElementById('jugador-ficha');
+  ficha.innerHTML = fichaHtml;
+  ficha.classList.add('visible');
+}
+
+// ═══════════════════════════════════════════════
+// RANKINGS
+// ═══════════════════════════════════════════════
+function buildRankings() {
+  const pstats = computePlayerStats();
+  const all = Object.values(pstats).filter(s => s.ryders >= 3);
+
+  function top10(label, subtitle, fn, suffix='') {
+    const sorted = [...all].sort((a,b) => fn(b)-fn(a)).slice(0,10);
+    const rows = sorted.map((s,i) => `
+      <tr>
+        <td class="rank-pos ${i<3?'top3':''}">${i+1}</td>
+        <td class="rank-nombre">${s.mote}</td>
+        <td class="rank-valor">${fn(s)}${suffix}</td>
+      </tr>`).join('');
+    return `
+      <div class="ranking-card">
+        <div class="ranking-header">
+          <div class="ranking-titulo">${label}</div>
+          <div class="ranking-subtitulo">${subtitle}</div>
+        </div>
+        <table class="ranking-table"><tbody>${rows}</tbody></table>
+      </div>`;
+  }
+
+  const pct = s => s.ryders > 0 ? parseFloat(((s.ganados + s.empatados*0.5)/s.ryders*100).toFixed(1)) : 0;
+
+  document.getElementById('rankings-grid').innerHTML = [
+    top10('Ryders ganados', 'Total victorias (ind + parejas)', s => s.ganados),
+    top10('Puntos totales', 'Suma de todos los puntos', s => parseFloat(s.pts.toFixed(1))),
+    top10('Partidos individuales ganados', 'Solo jornada individual', s => s.ganInd),
+    top10('Partidos de parejas ganados', 'Solo jornada de parejas', s => s.ganPar),
+    top10('% Victorias', 'Min. 3 partidos jugados', pct, '%'),
+    top10('Partidos jugados', 'Total individual + parejas', s => s.ryders),
+    top10('Puntos individual', 'Solo jornada individual', s => parseFloat(s.ptsInd.toFixed(1))),
+    top10('Puntos parejas', 'Solo jornada de parejas', s => parseFloat(s.ptsPar.toFixed(1))),
+  ].join('');
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+async function init() {
+  const resp = await fetch(DATA_URL);
+  D = await resp.json();
+
+  buildHome();
+  buildTimeline();
+  buildMerito();
+  buildJugadoresSelect();
+  buildRankings();
+
+  showSection('home');
+}
+
+init();
+</script>
+</body>
+</html>
