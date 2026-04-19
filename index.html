@@ -658,6 +658,21 @@ table.ranking-table tr:last-child td { border-bottom: none; }
 .color-oro { color: var(--oro); }
 .bold { font-weight: 700; }
 
+/* ── RESULTADO MATCH EN FICHA ── */
+.rdo-match {
+  display: inline-block;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+.rdo-g { background: rgba(27,82,41,0.12); color: var(--verde); }
+.rdo-p { background: rgba(200,150,12,0.10); color: #8B6000; }
+.rdo-e { background: var(--gris-claro); color: var(--gris); }
+
 /* ── MOBILE ── */
 @media (max-width: 700px) {
 
@@ -1249,6 +1264,17 @@ function mostrarJugador(num) {
     })
     .sort((a,b) => parseInt(b[0])-parseInt(a[0]));
 
+  // helper: formato resultado "g 3&2", "p 2&1", "AS"
+  function fmtRdo(rdoA, hoyos, esJugadorA) {
+    const rdo = esJugadorA ? rdoA : -rdoA;
+    const mag = Math.abs(rdoA);
+    let resultado, cls;
+    if (rdo > 0)      { cls='rdo-g'; resultado = hoyos > 0 ? `${mag}&${hoyos}` : `${mag} UP`; }
+    else if (rdo < 0) { cls='rdo-p'; resultado = hoyos > 0 ? `${mag}&${hoyos}` : `${mag} UP`; }
+    else              { cls='rdo-e'; resultado = 'AS'; }
+    return `<span class="rdo-match ${cls}">${resultado}</span>`;
+  }
+
   const histRows = edicsJugados.map(([edic_num, equipo_cod]) => {
     const edic = D.ediciones.find(e => e.edicion === parseInt(edic_num));
     if (!edic) return '';
@@ -1259,9 +1285,8 @@ function mostrarJugador(num) {
     const miEsA = equipo_cod === codA;
     const miPts = miEsA ? st.totalA : st.totalB;
     const rivPts = miEsA ? st.totalB : st.totalA;
-    const gane = miPts > rivPts ? '🏆' : miPts === rivPts ? '½' : '';
+    const copaIcon = miPts > rivPts ? '🏆' : miPts === rivPts ? '½' : '';
 
-    // individual matches this player
     const misInd = D.individuales.filter(r => r.edicion === parseInt(edic_num) && (r.jugA === num || r.jugB === num));
     const misPar = D.parejas.filter(r => r.edicion === parseInt(edic_num) && (r.jug1A === num || r.jug2A === num || r.jug1B === num || r.jug2B === num));
 
@@ -1272,14 +1297,38 @@ function mostrarJugador(num) {
       else ptsJ += r.ptosB||0;
     });
 
+    // Resultado individual: buscar el partido y rival
+    let rdoIndHtml = '<span style="color:var(--gris);font-size:0.8rem">—</span>';
+    let rivalInd = '';
+    if (misInd.length > 0) {
+      const r = misInd[0];
+      const esA = r.jugA === num;
+      rdoIndHtml = fmtRdo(r.rdoA, r.hoyos, esA);
+      rivalInd = esA ? (r.jugB_mote||'—') : (r.jugA_mote||'—');
+    }
+
+    // Resultado pareja: buscar el partido y compañero+rival
+    let rdoParHtml = '<span style="color:var(--gris);font-size:0.8rem">—</span>';
+    let infoPareja = '';
+    if (misPar.length > 0) {
+      const r = misPar[0];
+      const esLadoA = r.jug1A === num || r.jug2A === num;
+      rdoParHtml = fmtRdo(r.rdoA, r.hoyos, esLadoA);
+      // compañero
+      let comp = esLadoA
+        ? (r.jug1A === num ? r.jug2A_mote : r.jug1A_mote)
+        : (r.jug1B === num ? r.jug2B_mote : r.jug1B_mote);
+      infoPareja = comp ? `<span style="color:var(--gris);font-size:0.75rem"> c/${comp}</span>` : '';
+    }
+
     return `<tr>
       <td><span class="om-año">${edic.año}</span></td>
-      <td>${eq?.nombre||'—'}</td>
-      <td style="color:var(--gris)">${eqRival?.nombre||'—'}</td>
-      <td style="text-align:center">${gane}</td>
+      <td style="font-size:0.85rem">${eq?.nombre||'—'}</td>
+      <td style="color:var(--gris);font-size:0.85rem">${eqRival?.nombre||'—'}</td>
+      <td style="text-align:center">${copaIcon}</td>
       <td style="text-align:center;font-weight:600">${ptsJ}</td>
-      <td style="text-align:center">${misInd.length}</td>
-      <td style="text-align:center">${misPar.length}</td>
+      <td style="text-align:center">${rdoIndHtml}<br><span style="color:var(--gris);font-size:0.72rem">vs ${rivalInd||'—'}</span></td>
+      <td style="text-align:center">${rdoParHtml}${infoPareja}</td>
     </tr>`;
   }).join('');
 
@@ -1320,10 +1369,20 @@ function mostrarJugador(num) {
 // ═══════════════════════════════════════════════
 function buildRankings() {
   const pstats = computePlayerStats();
-  const all = Object.values(pstats).filter(s => s.ryders >= 3);
+  const TOTAL_EDICIONES = D.ediciones.filter(e => e.jugada).length;
+  const MIN_EDICIONES = Math.floor(TOTAL_EDICIONES * 0.5); // mínimo 50% de ediciones
+  const all = Object.values(pstats).filter(s => s.ediciones >= MIN_EDICIONES);
+  // Para rankings de % usar mismo filtro. Para rankings absolutos (copas, puntos...) sin filtro
+  const todos = Object.values(pstats).filter(s => s.ryders > 0);
 
-  function top10(label, subtitle, fn, suffix='') {
-    const sorted = [...all].sort((a,b) => fn(b)-fn(a)).slice(0,10);
+
+
+  const pct = s => s.ryders > 0 ? parseFloat(((s.ganados + s.empatados*0.5)/s.ryders*100).toFixed(1)) : 0;
+  const pctCopas = s => s.ediciones > 0 ? parseFloat((s.copas/s.ediciones*100).toFixed(1)) : 0;
+
+  // top10 con pool configurable
+  function top10pool(pool, label, subtitle, fn, suffix='') {
+    const sorted = [...pool].sort((a,b) => fn(b)-fn(a)).slice(0,10);
     const rows = sorted.map((s,i) => `
       <tr>
         <td class="rank-pos ${i<3?'top3':''}">${i+1}</td>
@@ -1340,19 +1399,18 @@ function buildRankings() {
       </div>`;
   }
 
-  const pct = s => s.ryders > 0 ? parseFloat(((s.ganados + s.empatados*0.5)/s.ryders*100).toFixed(1)) : 0;
-  const pctCopas = s => s.ediciones > 0 ? parseFloat((s.copas/s.ediciones*100).toFixed(1)) : 0;
+  const subtitleMin = `Mín. ${MIN_EDICIONES} ediciones jugadas`;
 
   document.getElementById('rankings-grid').innerHTML = [
-    top10('Copas ganadas', 'Ediciones ganadas como equipo', s => s.copas),
-    top10('Puntos totales', 'Suma de todos los puntos', s => parseFloat(s.pts.toFixed(1))),
-    top10('Partidos individuales ganados', 'Solo jornada individual', s => s.ganInd),
-    top10('Partidos de parejas ganados', 'Solo jornada de parejas', s => s.ganPar),
-    top10('% Partidos ganados', 'Min. 3 partidos, ind+par', pct, '%'),
-    top10('% Copas', 'Ediciones ganadas / jugadas', pctCopas, '%'),
-    top10('Partidos jugados', 'Total individual + parejas', s => s.ryders),
-    top10('Puntos individual', 'Solo jornada individual', s => parseFloat(s.ptsInd.toFixed(1))),
-    top10('Puntos parejas', 'Solo jornada de parejas', s => parseFloat(s.ptsPar.toFixed(1))),
+    top10pool(todos, 'Copas ganadas', 'Ediciones ganadas como equipo', s => s.copas),
+    top10pool(todos, 'Puntos totales', 'Suma de todos los puntos', s => parseFloat(s.pts.toFixed(1))),
+    top10pool(todos, 'Partidos individuales ganados', 'Solo jornada individual', s => s.ganInd),
+    top10pool(todos, 'Partidos de parejas ganados', 'Solo jornada de parejas', s => s.ganPar),
+    top10pool(all,   '% Partidos ganados', subtitleMin, pct, '%'),
+    top10pool(all,   '% Copas', subtitleMin, pctCopas, '%'),
+    top10pool(todos, 'Partidos jugados', 'Total individual + parejas', s => s.ryders),
+    top10pool(todos, 'Puntos individual', 'Solo jornada individual', s => parseFloat(s.ptsInd.toFixed(1))),
+    top10pool(todos, 'Puntos parejas', 'Solo jornada de parejas', s => parseFloat(s.ptsPar.toFixed(1))),
   ].join('');
 }
 
