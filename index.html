@@ -1111,6 +1111,15 @@ function renderEdicion(num) {
     return COLOR_LIGHT.has(c) ? 'var(--negro)' : 'white';
   }
 
+  // Color para franja ganador: si color1 es claro, usar color2; si ambos claros, fallback
+  function stripeColor(eq) {
+    const c1 = eq?.color1, c2 = eq?.color2;
+    if (!c1) return 'var(--verde)';
+    if (!COLOR_LIGHT.has(c1)) return colorHex(c1);
+    if (c2 && !COLOR_LIGHT.has(c2)) return colorHex(c2);
+    return 'var(--verde)'; // ambos claros → fallback verde
+  }
+
   // Formato resultado: "3&2", "1UP", "AS"
   function fmtMatch(rdoA, hoyos, esIzquierda) {
     const rdo = esIzquierda ? rdoA : -rdoA;
@@ -1205,7 +1214,7 @@ function renderEdicion(num) {
         <div class="jornada-titulo">Jornada 1 · Parejas (Greensome Chapman)</div>
         <div class="jornada-score">${e.equipoA?.nombre?.split("'")[0]} ${st.ptParA} – ${st.ptParB} ${e.equipoB?.nombre?.split("'")[0]}</div>
       </div>
-      <table class="matches-table" style="--match-color-a:${colorHex(e.equipoA?.color1)};--match-color-b:${colorHex(e.equipoB?.color1)}">
+      <table class="matches-table" style="--match-color-a:${stripeColor(e.equipoA)};--match-color-b:${stripeColor(e.equipoB)}">
         <thead><tr>
           <th>${e.equipoA?.nombre}</th><th style="text-align:center">Resultado</th>
           <th>${e.equipoB?.nombre}</th><th style="text-align:right">Puntos</th>
@@ -1219,7 +1228,7 @@ function renderEdicion(num) {
         <div class="jornada-titulo">Jornada 2 · Individual (Match Play)</div>
         <div class="jornada-score">${e.equipoA?.nombre?.split("'")[0]} ${st.ptIndA} – ${st.ptIndB} ${e.equipoB?.nombre?.split("'")[0]}</div>
       </div>
-      <table class="matches-table" style="--match-color-a:${colorHex(e.equipoA?.color1)};--match-color-b:${colorHex(e.equipoB?.color1)}">
+      <table class="matches-table" style="--match-color-a:${stripeColor(e.equipoA)};--match-color-b:${stripeColor(e.equipoB)}">
         <thead><tr>
           <th>${e.equipoA?.nombre}</th><th style="text-align:center">Resultado</th>
           <th>${e.equipoB?.nombre}</th><th style="text-align:right">Puntos</th>
