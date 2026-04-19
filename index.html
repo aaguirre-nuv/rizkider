@@ -437,7 +437,7 @@ table.matches-table tr.ganador-A td:first-child {
 }
 table.matches-table tr.ganador-B td:nth-child(3) {
   border-right: 4px solid var(--match-color-b, var(--oro));
-  background: color-mix(in srgb, var(--match-color-b, var(--oro)) 12%, transparent);
+  background: color-mix(in srgb, var(--match-color-b, var(--oro)) 14%, transparent);
   font-weight: 700;
 }
 table.matches-table tr.ganador-A td,
@@ -1111,14 +1111,30 @@ function renderEdicion(num) {
     return COLOR_LIGHT.has(c) ? 'var(--negro)' : 'white';
   }
 
-  // Color para franja ganador: si color1 es claro, usar color2; si ambos claros, fallback
-  function stripeColor(eq) {
-    const c1 = eq?.color1, c2 = eq?.color2;
-    if (!c1) return 'var(--verde)';
-    if (!COLOR_LIGHT.has(c1)) return colorHex(c1);
-    if (c2 && !COLOR_LIGHT.has(c2)) return colorHex(c2);
-    return 'var(--verde)'; // ambos claros → fallback verde
+  // Color franja: usa color del equipo, resolviendo conflictos entre equipos
+  function resolveStripeColors(eqA, eqB) {
+    const pickColor = (eq, preferLight) => {
+      const c1 = eq?.color1, c2 = eq?.color2;
+      if (!c1) return null;
+      // Preferimos el color más oscuro (más visible como franja)
+      if (!COLOR_LIGHT.has(c1)) return c1;
+      if (c2 && !COLOR_LIGHT.has(c2)) return c2;
+      return c1; // si ambos claros, devolver c1 igualmente
+    };
+    let cA = pickColor(eqA);
+    let cB = pickColor(eqB);
+    // Si los dos son iguales, el segundo usa color2
+    if (cA && cB && cA === cB) {
+      const alt = eqB?.color2;
+      if (alt && alt !== cA) cB = alt;
+      else { cA = eqA?.color1; cB = eqB?.color1; } // forzar color1 de cada uno
+    }
+    return [
+      cA ? colorHex(cA) : 'var(--verde)',
+      cB ? colorHex(cB) : 'var(--oro)'
+    ];
   }
+  const [_scA, _scB] = resolveStripeColors(e.equipoA, e.equipoB);
 
   // Formato resultado: "3&2", "1UP", "AS"
   function fmtMatch(rdoA, hoyos, esIzquierda) {
@@ -1214,7 +1230,7 @@ function renderEdicion(num) {
         <div class="jornada-titulo">Jornada 1 · Parejas (Greensome Chapman)</div>
         <div class="jornada-score">${e.equipoA?.nombre?.split("'")[0]} ${st.ptParA} – ${st.ptParB} ${e.equipoB?.nombre?.split("'")[0]}</div>
       </div>
-      <table class="matches-table" style="--match-color-a:${stripeColor(e.equipoA)};--match-color-b:${stripeColor(e.equipoB)}">
+      <table class="matches-table" style="--match-color-a:${_scA};--match-color-b:${_scB}">
         <thead><tr>
           <th>${e.equipoA?.nombre}</th><th style="text-align:center">Resultado</th>
           <th>${e.equipoB?.nombre}</th><th style="text-align:right">Puntos</th>
@@ -1228,7 +1244,7 @@ function renderEdicion(num) {
         <div class="jornada-titulo">Jornada 2 · Individual (Match Play)</div>
         <div class="jornada-score">${e.equipoA?.nombre?.split("'")[0]} ${st.ptIndA} – ${st.ptIndB} ${e.equipoB?.nombre?.split("'")[0]}</div>
       </div>
-      <table class="matches-table" style="--match-color-a:${stripeColor(e.equipoA)};--match-color-b:${stripeColor(e.equipoB)}">
+      <table class="matches-table" style="--match-color-a:${_scA};--match-color-b:${_scB}">
         <thead><tr>
           <th>${e.equipoA?.nombre}</th><th style="text-align:center">Resultado</th>
           <th>${e.equipoB?.nombre}</th><th style="text-align:right">Puntos</th>
