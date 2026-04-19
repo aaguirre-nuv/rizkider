@@ -1107,30 +1107,9 @@ function renderEdicion(num) {
     return COLOR_LIGHT.has(c) ? 'var(--negro)' : 'white';
   }
 
-  // Color franja: usa color del equipo, resolviendo conflictos entre equipos
-  function resolveStripeColors(eqA, eqB) {
-    const pickColor = (eq, preferLight) => {
-      const c1 = eq?.color1, c2 = eq?.color2;
-      if (!c1) return null;
-      // Preferimos el color más oscuro (más visible como franja)
-      if (!COLOR_LIGHT.has(c1)) return c1;
-      if (c2 && !COLOR_LIGHT.has(c2)) return c2;
-      return c1; // si ambos claros, devolver c1 igualmente
-    };
-    let cA = pickColor(eqA);
-    let cB = pickColor(eqB);
-    // Si los dos son iguales, el segundo usa color2
-    if (cA && cB && cA === cB) {
-      const alt = eqB?.color2;
-      if (alt && alt !== cA) cB = alt;
-      else { cA = eqA?.color1; cB = eqB?.color1; } // forzar color1 de cada uno
-    }
-    return [
-      cA ? colorHex(cA) : 'var(--verde)',
-      cB ? colorHex(cB) : 'var(--oro)'
-    ];
-  }
-  const [_scA, _scB] = resolveStripeColors(e.equipoA, e.equipoB);
+  // Franjas: color1 de cada equipo directamente
+  const _scA = e.equipoA?.color1 ? colorHex(e.equipoA.color1) : 'var(--verde)';
+  const _scB = e.equipoB?.color1 ? colorHex(e.equipoB.color1) : 'var(--oro)';
 
   // Formato resultado: "3&2", "1UP", "AS"
   function fmtMatch(rdoA, hoyos, esIzquierda) {
@@ -1178,14 +1157,19 @@ function renderEdicion(num) {
   // Header equipos: A siempre izquierda, B siempre derecha
   function eqColHtml(eq, isWinner) {
     const bg = eq?.color1 ? colorHex(eq.color1) : (isWinner ? 'var(--verde)' : 'var(--crema)');
-    const txt = teamTextColor(eq, isWinner);
+    const txt = COLOR_LIGHT.has(eq?.color1) ? 'var(--negro)' : 'white';
+    const borderStyle = isWinner
+      ? 'box-shadow:inset 0 0 0 3px rgba(255,255,255,0.4), 0 4px 20px rgba(0,0,0,0.2);'
+      : 'opacity:0.85;';
     const badge = isWinner
-      ? `<span class="eq-badge campeon" style="background:rgba(255,255,255,0.22);color:${txt==='var(--negro)'?'var(--negro)':'white'}">🏆 Campeón</span>`
-      : `<span class="eq-badge subcampeon" style="background:rgba(0,0,0,0.08);color:${txt}">Subcampeón</span>`;
-    return `<div class="eq-col" style="background:${bg};color:${txt};text-align:center;padding:24px 20px">
+      ? `<span class="eq-badge campeon" style="background:rgba(255,255,255,0.25);color:${txt==='var(--negro)'?'var(--negro)':'white'};font-size:0.8rem;padding:4px 14px">🏆 Campeón</span>`
+      : `<span class="eq-badge subcampeon" style="background:rgba(0,0,0,0.1);color:${txt};font-size:0.72rem">Subcampeón</span>`;
+    const nombreSize = isWinner ? '1.7rem' : '1.3rem';
+    const padding = isWinner ? '28px 24px' : '20px 20px';
+    return `<div class="eq-col" style="background:${bg};color:${txt};text-align:center;padding:${padding};${borderStyle}">
       ${badge}
-      <div class="eq-nombre" style="color:${txt}">${eq?.nombre||'—'}</div>
-      ${eq?.capitan ? `<div style="font-family:'Barlow Condensed';font-size:0.8rem;margin-top:8px;opacity:0.7">Cap: ${eq.capitan}</div>` : ''}
+      <div class="eq-nombre" style="color:${txt};font-size:${nombreSize};margin-top:8px">${eq?.nombre||'—'}</div>
+      ${eq?.capitan ? `<div style="font-family:'Barlow Condensed';font-size:0.8rem;margin-top:8px;opacity:0.75">Cap: ${eq.capitan}</div>` : ''}
     </div>`;
   }
 
