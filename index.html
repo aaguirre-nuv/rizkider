@@ -930,7 +930,7 @@ function computePlayerStats() {
   D.jugadores.forEach(j => {
     stats[j.num] = {
       num: j.num, mote: j.mote, nombre: j.nombre,
-      ediciones: 0, copas: 0, ryders: 0, pts: 0, ptsInd: 0, ptsPar: 0,
+      ediciones: 0, copas: 0, ryders: 0, rydersInd: 0, rydersPar: 0, pts: 0, ptsInd: 0, ptsPar: 0,
       ganados: 0, empatados: 0, perdidos: 0,
       ganInd: 0, ganPar: 0, perInd: 0, perPar: 0,
     };
@@ -945,6 +945,7 @@ function computePlayerStats() {
       s.pts += pts;
       s.ptsInd += pts;
       s.ryders++;
+      s.rydersInd++;
       if (rdo > 0) { s.ganados++; s.ganInd++; }
       else if (rdo === 0) s.empatados++;
       else { s.perdidos++; s.perInd++; }
@@ -961,6 +962,7 @@ function computePlayerStats() {
         s.pts += pts;
         s.ptsPar += pts;
         s.ryders++;
+        s.rydersPar++;
         if (rdo > 0) { s.ganados++; s.ganPar++; }
         else if (rdo === 0) s.empatados++;
         else { s.perdidos++; s.perPar++; }
@@ -1387,15 +1389,39 @@ function mostrarJugador(num) {
     </div>
     <div class="ficha-tabla-wrap">
       <div class="ficha-tabs">
-        <div class="ficha-tab activo">Historial por edición</div>
+        <div class="ficha-tab activo" onclick="fichaTab(this,'historial-${num}')">Historial</div>
+        <div class="ficha-tab" onclick="fichaTab(this,'stats-${num}')">Estadísticas</div>
       </div>
-      <table class="matches-table" style="margin:0">
-        <thead><tr>
-          <th>Año</th><th>Equipo</th><th>Rival</th><th style="text-align:center">Copa</th>
-          <th style="text-align:center">Pts</th><th style="text-align:center">Ind</th><th style="text-align:center">Par</th>
-        </tr></thead>
-        <tbody>${histRows}</tbody>
-      </table>
+
+      <div id="historial-${num}">
+        <table class="matches-table" style="margin:0">
+          <thead><tr>
+            <th>Año</th><th>Equipo</th><th>Rival</th><th style="text-align:center">Copa</th>
+            <th style="text-align:center">Pts</th><th style="text-align:center">Ind</th><th style="text-align:center">Par</th>
+          </tr></thead>
+          <tbody>${histRows}</tbody>
+        </table>
+      </div>
+
+      <div id="stats-${num}" style="display:none">
+        <table class="matches-table" style="margin:0">
+          <thead><tr>
+            <th>Métrica</th><th style="text-align:right">Total</th><th style="text-align:right">Individual</th><th style="text-align:right">Parejas</th>
+          </tr></thead>
+          <tbody>
+            <tr><td>Ediciones jugadas</td><td style="text-align:right;font-weight:700">${s.ediciones}</td><td style="text-align:right;color:var(--gris)">—</td><td style="text-align:right;color:var(--gris)">—</td></tr>
+            <tr><td>Copas ganadas</td><td style="text-align:right;font-weight:700">${s.copas}</td><td style="text-align:right;color:var(--gris)">—</td><td style="text-align:right;color:var(--gris)">—</td></tr>
+            <tr><td>Partidos jugados</td><td style="text-align:right;font-weight:700">${s.ryders}</td><td style="text-align:right">${s.rydersInd}</td><td style="text-align:right">${s.rydersPar}</td></tr>
+            <tr><td>Ganados</td><td style="text-align:right;font-weight:700;color:var(--verde)">${s.ganados}</td><td style="text-align:right;color:var(--verde)">${s.ganInd}</td><td style="text-align:right;color:var(--verde)">${s.ganPar}</td></tr>
+            <tr><td>Empatados</td><td style="text-align:right;font-weight:700">${s.empatados}</td><td style="text-align:right;color:var(--gris)">—</td><td style="text-align:right;color:var(--gris)">—</td></tr>
+            <tr><td>Perdidos</td><td style="text-align:right;font-weight:700;color:var(--oro)">${s.perdidos}</td><td style="text-align:right;color:var(--oro)">${s.perInd}</td><td style="text-align:right;color:var(--oro)">${s.perPar}</td></tr>
+            <tr><td>Puntos totales</td><td style="text-align:right;font-weight:700">${s.pts.toFixed(1)}</td><td style="text-align:right">${s.ptsInd.toFixed(1)}</td><td style="text-align:right">${s.ptsPar.toFixed(1)}</td></tr>
+            <tr><td>Puntos / partido</td><td style="text-align:right;font-weight:700">${s.ryders>0?(s.pts/s.ryders).toFixed(2):'-'}</td><td style="text-align:right">${s.rydersInd>0?(s.ptsInd/s.rydersInd).toFixed(2):'-'}</td><td style="text-align:right">${s.rydersPar>0?(s.ptsPar/s.rydersPar).toFixed(2):'-'}</td></tr>
+            <tr><td>% Victorias</td><td style="text-align:right;font-weight:700">${s.ryders>0?((s.ganados+s.empatados*0.5)/s.ryders*100).toFixed(1)+'%':'-'}</td><td style="text-align:right">${s.rydersInd>0?(s.ganInd/s.rydersInd*100).toFixed(1)+'%':'-'}</td><td style="text-align:right">${s.rydersPar>0?(s.ganPar/s.rydersPar*100).toFixed(1)+'%':'-'}</td></tr>
+            <tr><td>% Copas</td><td style="text-align:right;font-weight:700">${s.ediciones>0?(s.copas/s.ediciones*100).toFixed(1)+'%':'-'}</td><td style="text-align:right;color:var(--gris)">—</td><td style="text-align:right;color:var(--gris)">—</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   `;
 
@@ -1452,6 +1478,19 @@ function buildRankings() {
     top10pool(todos, 'Puntos individual', 'Solo jornada individual', s => parseFloat(s.ptsInd.toFixed(1))),
     top10pool(todos, 'Puntos parejas', 'Solo jornada de parejas', s => parseFloat(s.ptsPar.toFixed(1))),
   ].join('');
+}
+
+// ═══════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════
+function fichaTab(btn, targetId) {
+  const wrap = btn.closest('.ficha-tabla-wrap');
+  wrap.querySelectorAll('.ficha-tab').forEach(t => t.classList.remove('activo'));
+  btn.classList.add('activo');
+  wrap.querySelectorAll('[id]').forEach(el => {
+    if (el.id === targetId) el.style.display = 'block';
+    else if (el.id.startsWith('historial-') || el.id.startsWith('stats-')) el.style.display = 'none';
+  });
 }
 
 // ═══════════════════════════════════════════════
