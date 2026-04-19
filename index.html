@@ -1111,13 +1111,22 @@ function renderEdicion(num) {
   const _scA = e.equipoA?.color1 ? colorHex(e.equipoA.color1) : 'var(--verde)';
   const _scB = e.equipoB?.color1 ? colorHex(e.equipoB.color1) : 'var(--oro)';
 
-  // Formato resultado: "3&2", "1UP", "AS"
+  // Formato resultado: "3&2", "1UP", "AS" — color del equipo ganador
+  const scA = e.equipoA?.color1 ? colorHex(e.equipoA.color1) : 'var(--verde)';
+  const scB = e.equipoB?.color1 ? colorHex(e.equipoB.color1) : 'var(--oro)';
+  const scA_txt = COLOR_LIGHT.has(e.equipoA?.color1) ? 'var(--negro)' : 'white';
+  const scB_txt = COLOR_LIGHT.has(e.equipoB?.color1) ? 'var(--negro)' : 'white';
+
   function fmtMatch(rdoA, hoyos, esIzquierda) {
     const rdo = esIzquierda ? rdoA : -rdoA;
     const mag = Math.abs(rdoA);
-    if (rdo === 0) return { txt: 'AS', cls: 'pill-E' };
+    if (rdo === 0) return { txt: 'AS', style: 'background:var(--gris-claro);color:var(--gris)' };
     const txt = hoyos > 0 ? `${mag}&${hoyos}` : `${mag}UP`;
-    return { txt, cls: rdo > 0 ? 'pill-A' : 'pill-B' };
+    // ganador izquierda = equipo A (scA), ganador derecha = equipo B (scB)
+    const winA = esIzquierda ? rdo > 0 : rdo < 0;
+    const bg = winA ? scA : scB;
+    const tc = winA ? scA_txt : scB_txt;
+    return { txt, style: `background:${bg};color:${tc}` };
   }
 
   const parJ1 = D.parejas.filter(r => r.edicion === num);
@@ -1130,10 +1139,10 @@ function renderEdicion(num) {
     const [leftName, rightName, rdo] = eqAisA
       ? [moteA, moteB, r.rdoA] : [moteB, moteA, -r.rdoA];
     const rowClass = rdo > 0 ? 'ganador-A' : rdo < 0 ? 'ganador-B' : '';
-    const {txt, cls} = fmtMatch(r.rdoA, r.hoyos, eqAisA);
+    const {txt, style} = fmtMatch(r.rdoA, r.hoyos, eqAisA);
     return `<tr class="${rowClass}">
       <td ${rdo > 0 ? 'class="bold"' : ""}>${leftName}</td>
-      <td style="text-align:center"><span class="resultado-pill ${cls}">${txt}</span></td>
+      <td style="text-align:center"><span class="resultado-pill" style="${style}">${txt}</span></td>
       <td ${rdo < 0 ? 'class="bold"' : ""}>${rightName}</td>
       <td class="pts-cell" style="text-align:right">${eqAisA ? r.ptosA : r.ptosB} – ${eqAisA ? r.ptosB : r.ptosA}</td>
     </tr>`;
@@ -1145,10 +1154,10 @@ function renderEdicion(num) {
       ? [r.jugA_mote, r.jugB_mote, r.rdoA]
       : [r.jugB_mote, r.jugA_mote, -r.rdoA];
     const rowClass = rdo > 0 ? 'ganador-A' : rdo < 0 ? 'ganador-B' : '';
-    const {txt, cls} = fmtMatch(r.rdoA, r.hoyos, eqAisA);
+    const {txt, style} = fmtMatch(r.rdoA, r.hoyos, eqAisA);
     return `<tr class="${rowClass}">
       <td ${rdo > 0 ? 'class="bold"' : ""}>${leftName||'—'}</td>
-      <td style="text-align:center"><span class="resultado-pill ${cls}">${txt}</span></td>
+      <td style="text-align:center"><span class="resultado-pill" style="${style}">${txt}</span></td>
       <td ${rdo < 0 ? 'class="bold"' : ""}>${rightName||'—'}</td>
       <td class="pts-cell" style="text-align:right">${eqAisA ? r.ptosA : r.ptosB} – ${eqAisA ? r.ptosB : r.ptosA}</td>
     </tr>`;
