@@ -889,11 +889,15 @@ let D = null; // will hold parsed data
 
 // Color map
 const COLOR_MAP = {
-  'Blanco': '#FFFFFF', 'Azul': '#2563EB', 'Amarillo': '#F59E0B',
-  'Rojo': '#DC2626', 'Verde': '#16A34A', 'Rosa': '#EC4899',
+  'Blanco': '#F8F8F8', 'Azul': '#2563EB', 'Amarillo': '#F59E0B',
+  'Rojo': '#CC2222', 'Verde': '#16A34A', 'Rosa': '#F472B6',
   'Morado': '#7C3AED', 'Naranja': '#EA580C', 'Gris': '#6B7280',
-  'Negro': '#1F2937', 'Marrón': '#92400E', 'Turquesa': '#0D9488',
+  'Negro': '#1A1A1A', 'Marrón': '#92400E', 'Turquesa': '#0891B2',
+  'AzulOscuro': '#1E3A8A', 'Marino': '#1E3A8A',
+  'Crema': '#F5F0E0', 'Lima': '#84CC16',
 };
+// Colores que necesitan texto oscuro encima
+const COLOR_LIGHT = new Set(['Blanco','Amarillo','Rosa','Crema','Beige','Lima']);
 function colorHex(name) {
   if (!name) return '#cccccc';
   return COLOR_MAP[name] || '#cccccc';
@@ -1104,9 +1108,7 @@ function renderEdicion(num) {
   function teamTextColor(eq, isWinner) {
     const c = eq?.color1;
     if (!c) return isWinner ? 'white' : 'var(--negro)';
-    // colores claros → texto oscuro
-    const light = ['Blanco','Amarillo','Rosa','Crema','Beige'];
-    return light.includes(c) ? 'var(--negro)' : 'white';
+    return COLOR_LIGHT.has(c) ? 'var(--negro)' : 'white';
   }
 
   // Formato resultado: "3&2", "1UP", "AS"
