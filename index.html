@@ -1238,22 +1238,33 @@ function buildMerito() {
     const ptIndC = ganA ? st.ptIndA : st.ptIndB;
     const ptIndS = ganA ? st.ptIndB : st.ptIndA;
 
+    // Colores del equipo campeón y subcampeón
+    const bgC = campeon?.color1 ? colorHex(campeon.color1) : 'var(--verde)';
+    const txtC = COLOR_LIGHT.has(campeon?.color1) ? 'var(--negro)' : 'white';
+    const bgS = subcampeon?.color1 ? colorHex(subcampeon.color1) : 'transparent';
+    const txtS = COLOR_LIGHT.has(subcampeon?.color1) ? 'var(--negro)' : (subcampeon?.color1 ? 'white' : 'var(--gris)');
+
     rows.push(`
-      <tr class="row-campeon">
-        <td class="om-año" rowspan="2">${e.año}</td>
+      <tr>
+        <td class="om-año" rowspan="2" style="border-left:4px solid ${bgC}">${e.año}</td>
         <td rowspan="2" style="color:var(--gris);font-family:'Barlow Condensed'">Ed. ${e.edicion}</td>
-        <td><span class="resultado-pill pill-A">🏆</span></td>
-        <td class="om-equipo">${campeon?.nombre||'—'}</td>
-        <td class="om-pts">${ptParC}</td>
-        <td class="om-pts">${ptIndC}</td>
-        <td class="om-pts">${ptC}</td>
+        <td style="background:${bgC};padding:0;width:6px" rowspan="2"></td>
+        <td style="background:${bgC}">
+          <span style="display:inline-flex;align-items:center;gap:6px;font-family:'Barlow Condensed';font-size:0.7rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:${txtC};background:rgba(255,255,255,0.2);padding:2px 8px;border-radius:10px">🏆 Campeón</span>
+        </td>
+        <td class="om-equipo" style="background:${bgC};color:${txtC};font-size:1.05rem;font-weight:700">${campeon?.nombre||'—'}</td>
+        <td class="om-pts" style="background:${bgC};color:${txtC}">${ptParC}</td>
+        <td class="om-pts" style="background:${bgC};color:${txtC}">${ptIndC}</td>
+        <td class="om-pts" style="background:${bgC};color:${txtC};font-size:1.1rem">${ptC}</td>
       </tr>
-      <tr class="row-subcampeon">
-        <td><span class="resultado-pill pill-E" style="opacity:0.6">2º</span></td>
-        <td class="om-equipo" style="color:var(--gris)">${subcampeon?.nombre||'—'}</td>
-        <td style="color:var(--gris)">${ptParS}</td>
-        <td style="color:var(--gris)">${ptIndS}</td>
-        <td style="color:var(--gris)">${ptS}</td>
+      <tr>
+        <td style="background:color-mix(in srgb,${bgS} 15%,transparent)">
+          <span style="font-family:'Barlow Condensed';font-size:0.7rem;color:var(--gris);letter-spacing:0.08em;text-transform:uppercase">2º</span>
+        </td>
+        <td class="om-equipo" style="color:var(--gris);background:color-mix(in srgb,${bgS} 15%,transparent)">${subcampeon?.nombre||'—'}</td>
+        <td style="color:var(--gris);background:color-mix(in srgb,${bgS} 15%,transparent)">${ptParS}</td>
+        <td style="color:var(--gris);background:color-mix(in srgb,${bgS} 15%,transparent)">${ptIndS}</td>
+        <td style="color:var(--gris);background:color-mix(in srgb,${bgS} 15%,transparent)">${ptS}</td>
       </tr>
     `);
   });
