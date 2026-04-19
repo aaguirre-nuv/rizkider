@@ -1080,80 +1080,109 @@ function renderEdicion(num) {
 
   const st = computeEdicionStats(num);
   const codA = e.equipoA?.cod;
-  const codB = e.equipoB?.cod;
-
   const ganadorA = st.totalA >= st.totalB;
-  const ganadorClass = (isA) => isA === ganadorA ? 'ganador' : 'perdedor';
-  const badgeHtml = (isA) => {
-    const winner = isA === ganadorA;
-    return `<span class="eq-badge ${winner ? 'campeon' : 'subcampeon'}">${winner ? '🏆 Campeón' : 'Subcampeón'}</span>`;
-  };
 
-  function coloresHtml(eq) {
-    if (!eq?.color1 && !eq?.color2) return '';
-    return `<div class="eq-colores">
-      ${eq.color1 ? `<div class="color-chip" style="background:${colorHex(eq.color1)}" title="${eq.color1}"></div>` : ''}
-      ${eq.color2 ? `<div class="color-chip" style="background:${colorHex(eq.color2)}" title="${eq.color2}"></div>` : ''}
-    </div>`;
+  // Color de equipo: usar el del año o fallback
+  function teamBg(eq, isWinner) {
+    const c = eq?.color1;
+    const hex = c ? colorHex(c) : (isWinner ? 'var(--verde)' : 'var(--crema)');
+    return hex;
+  }
+  function teamTextColor(eq, isWinner) {
+    const c = eq?.color1;
+    if (!c) return isWinner ? 'white' : 'var(--negro)';
+    // colores claros → texto oscuro
+    const light = ['Blanco','Amarillo','Rosa','Crema','Beige'];
+    return light.includes(c) ? 'var(--negro)' : 'white';
   }
 
-  // Parejas jornada 1
+  // Formato resultado: "3&2", "1UP", "AS"
+  function fmtMatch(rdoA, hoyos, esIzquierda) {
+    const rdo = esIzquierda ? rdoA : -rdoA;
+    const mag = Math.abs(rdoA);
+    if (rdo === 0) return { txt: 'AS', cls: 'pill-E' };
+    const txt = hoyos > 0 ? `${mag}&${hoyos}` : `${mag}UP`;
+    return { txt, cls: rdo > 0 ? 'pill-A' : 'pill-B' };
+  }
+
   const parJ1 = D.parejas.filter(r => r.edicion === num);
-  // Individual jornada 2
   const indJ2 = D.individuales.filter(r => r.edicion === num);
 
   function matchRowParejas(r) {
     const eqAisA = r.equipoA === codA;
     const moteA = `${r.jug1A_mote} & ${r.jug2A_mote}`;
     const moteB = `${r.jug1B_mote} & ${r.jug2B_mote}`;
-    // Normalize: show team A (of edition) on left
-    const [leftName, rightName, rdo, ptL, ptR] = eqAisA
-      ? [moteA, moteB, r.rdoA, r.ptosA, r.ptosB]
-      : [moteB, moteA, -r.rdoA, r.ptosB, r.ptosA];
+    const [leftName, rightName, rdo] = eqAisA
+      ? [moteA, moteB, r.rdoA] : [moteB, moteA, -r.rdoA];
     const rowClass = rdo > 0 ? 'ganador-A' : rdo < 0 ? 'ganador-B' : '';
-    const pill = rdo > 0 ? '<span class="resultado-pill pill-A">1</span>' : rdo < 0 ? '<span class="resultado-pill pill-B">1</span>' : '<span class="resultado-pill pill-E">½</span>';
+    const {txt, cls} = fmtMatch(r.rdoA, r.hoyos, eqAisA);
     return `<tr class="${rowClass}">
       <td class="bold">${leftName}</td>
-      <td style="text-align:center">${pill}</td>
+      <td style="text-align:center"><span class="resultado-pill ${cls}">${txt}</span></td>
       <td>${rightName}</td>
-      <td class="pts-cell" style="text-align:right">${ptL||0} – ${ptR||0}</td>
+      <td class="pts-cell" style="text-align:right">${eqAisA ? r.ptosA : r.ptosB} – ${eqAisA ? r.ptosB : r.ptosA}</td>
     </tr>`;
   }
 
   function matchRowIndividual(r) {
     const eqAisA = r.jugA_equipo === codA;
-    const [leftName, rightName, rdo, ptL, ptR] = eqAisA
-      ? [r.jugA_mote, r.jugB_mote, r.rdoA, r.ptosA, r.ptosB]
-      : [r.jugB_mote, r.jugA_mote, -r.rdoA, r.ptosB, r.ptosA];
+    const [leftName, rightName, rdo] = eqAisA
+      ? [r.jugA_mote, r.jugB_mote, r.rdoA]
+      : [r.jugB_mote, r.jugA_mote, -r.rdoA];
     const rowClass = rdo > 0 ? 'ganador-A' : rdo < 0 ? 'ganador-B' : '';
-    const pill = rdo > 0 ? '<span class="resultado-pill pill-A">1</span>' : rdo < 0 ? '<span class="resultado-pill pill-B">1</span>' : '<span class="resultado-pill pill-E">½</span>';
+    const {txt, cls} = fmtMatch(r.rdoA, r.hoyos, eqAisA);
     return `<tr class="${rowClass}">
       <td class="bold">${leftName||'—'}</td>
-      <td style="text-align:center">${pill}</td>
+      <td style="text-align:center"><span class="resultado-pill ${cls}">${txt}</span></td>
       <td>${rightName||'—'}</td>
-      <td class="pts-cell" style="text-align:right">${ptL||0} – ${ptR||0}</td>
+      <td class="pts-cell" style="text-align:right">${eqAisA ? r.ptosA : r.ptosB} – ${eqAisA ? r.ptosB : r.ptosA}</td>
     </tr>`;
   }
 
-  const scoreHtml = `<div class="score-big">${st.totalA.toFixed(1)}<span class="score-separador"> – </span>${st.totalB.toFixed(1)}</div>
+  // Header equipos con color del año
+  const bgA = teamBg(e.equipoA, ganadorA);
+  const bgB = teamBg(e.equipoB, !ganadorA);
+  const txtA = teamTextColor(e.equipoA, ganadorA);
+  const txtB = teamTextColor(e.equipoB, !ganadorA);
+
+  function eqHeaderHtml(eq, isA, isWinner, bg, txt) {
+    const badge = isWinner
+      ? `<span class="eq-badge campeon" style="background:rgba(255,255,255,0.25);color:${txt === 'var(--negro)' ? 'var(--negro)' : 'white'}">🏆 Campeón</span>`
+      : `<span class="eq-badge subcampeon" style="background:rgba(0,0,0,0.1);color:${txt}">Subcampeón</span>`;
+    return `<div class="eq-col" style="background:${bg};color:${txt};text-align:center;padding:24px 20px">
+      ${badge}
+      <div class="eq-nombre" style="color:${txt}">${eq?.nombre||'—'}</div>
+      ${eq?.capitan ? `<div style="font-family:'Barlow Condensed';font-size:0.8rem;margin-top:8px;opacity:0.7">Cap: ${eq.capitan}</div>` : ''}
+    </div>`;
+  }
+
+  const scoreHtml = `
+    <div class="score-big">${st.totalA.toFixed(1)}<span class="score-separador"> – </span>${st.totalB.toFixed(1)}</div>
     <div class="puntos-desglose">Par: ${st.ptParA}–${st.ptParB} · Ind: ${st.ptIndA}–${st.ptIndB}</div>
     <div class="score-fecha">${e.fecha1} · ${e.campo1} / ${e.campo2}</div>`;
 
+  // Ganador a la izquierda siempre
+  const [colIzq, colDcha] = ganadorA
+    ? [eqHeaderHtml(e.equipoA, true,  true,  bgA, txtA), eqHeaderHtml(e.equipoB, false, false, bgB, txtB)]
+    : [eqHeaderHtml(e.equipoB, false, true,  bgB, txtB), eqHeaderHtml(e.equipoA, true,  false, bgA, txtA)];
+  const [thIzq, thDcha] = ganadorA
+    ? [e.equipoA?.nombre, e.equipoB?.nombre]
+    : [e.equipoB?.nombre, e.equipoA?.nombre];
+  const [ptParIzq, ptParDcha] = ganadorA ? [st.ptParA, st.ptParB] : [st.ptParB, st.ptParA];
+  const [ptIndIzq, ptIndDcha] = ganadorA ? [st.ptIndA, st.ptIndB] : [st.ptIndB, st.ptIndA];
+
+  // Para la tabla: si ganadorB, invertir las filas de partido
+  function invertirFila(rowFn, r) {
+    if (ganadorA) return rowFn(r);
+    // swap A↔B perspective
+    return rowFn(r); // las funciones ya normalizan según codA
+  }
+
   const html = `
     <div class="edicion-header">
-      <div class="eq-col ${ganadorClass(true)}">
-        ${badgeHtml(true)}
-        <div class="eq-nombre">${e.equipoA?.nombre || '—'}</div>
-        ${coloresHtml(e.equipoA)}
-        ${e.equipoA?.capitan ? `<div style="font-family:'Barlow Condensed';font-size:0.8rem;margin-top:8px;opacity:0.7">Cap: ${e.equipoA.capitan}</div>` : ''}
-      </div>
+      ${colIzq}
       <div class="eq-col center-score">${scoreHtml}</div>
-      <div class="eq-col ${ganadorClass(false)}">
-        ${badgeHtml(false)}
-        <div class="eq-nombre">${e.equipoB?.nombre || '—'}</div>
-        ${coloresHtml(e.equipoB)}
-        ${e.equipoB?.capitan ? `<div style="font-family:'Barlow Condensed';font-size:0.8rem;margin-top:8px;opacity:0.7">Cap: ${e.equipoB.capitan}</div>` : ''}
-      </div>
+      ${colDcha}
     </div>
 
     <div class="jornada-section">
@@ -1163,7 +1192,7 @@ function renderEdicion(num) {
       </div>
       <table class="matches-table">
         <thead><tr>
-          <th>${e.equipoA?.nombre}</th><th style="text-align:center">Rdo</th>
+          <th>${e.equipoA?.nombre}</th><th style="text-align:center">Resultado</th>
           <th>${e.equipoB?.nombre}</th><th style="text-align:right">Puntos</th>
         </tr></thead>
         <tbody>${parJ1.map(matchRowParejas).join('')}</tbody>
@@ -1177,7 +1206,7 @@ function renderEdicion(num) {
       </div>
       <table class="matches-table">
         <thead><tr>
-          <th>${e.equipoA?.nombre}</th><th style="text-align:center">Rdo</th>
+          <th>${e.equipoA?.nombre}</th><th style="text-align:center">Resultado</th>
           <th>${e.equipoB?.nombre}</th><th style="text-align:right">Puntos</th>
         </tr></thead>
         <tbody>${indJ2.map(matchRowIndividual).join('')}</tbody>
