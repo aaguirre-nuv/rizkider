@@ -287,6 +287,163 @@ main { max-width: 1100px; margin: 0 auto; padding: 32px 24px 64px; }
   cursor: default;
   text-decoration: line-through;
 }
+.year-btn.futura {
+  border-color: var(--oro);
+  color: var(--oro);
+  position: relative;
+}
+.year-btn.futura.activo { background: var(--oro); color: var(--negro); border-color: var(--oro); }
+.year-btn.futura::after {
+  content: '';
+  position: absolute;
+  top: -3px; right: -3px;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--oro);
+}
+
+/* ── ESTADOS ESPECIALES DE EDICIÓN ── */
+.edicion-especial {
+  background: white;
+  border-radius: 12px;
+  padding: 32px 28px;
+  box-shadow: 0 2px 12px var(--sombra);
+  text-align: center;
+  margin-bottom: 24px;
+}
+.edicion-especial .badge-estado {
+  display: inline-block;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-bottom: 14px;
+}
+.badge-historica { background: var(--gris-claro); color: var(--gris); }
+.badge-futura { background: var(--oro); color: var(--negro); }
+.edicion-especial .campeon-conocido {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--verde);
+  margin: 8px 0;
+}
+.edicion-especial .nota {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.9rem;
+  color: var(--gris);
+  max-width: 500px;
+  margin: 8px auto 0;
+  line-height: 1.5;
+}
+.plantilla-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 16px;
+}
+.plantilla-tag {
+  background: var(--crema);
+  border: 1px solid var(--gris-claro);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  border-radius: 14px;
+  color: var(--negro);
+}
+
+/* ── PREVIA EDICIÓN FUTURA ── */
+.previa-roster {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+.previa-team-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px var(--sombra);
+}
+.previa-team-header {
+  padding: 18px 20px;
+  text-align: center;
+}
+.previa-team-nombre {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+.previa-team-cap {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.78rem;
+  opacity: 0.85;
+  margin-top: 4px;
+}
+.previa-jugador-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 18px;
+  border-bottom: 1px solid var(--gris-claro);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.9rem;
+}
+.previa-jugador-row:last-child { border-bottom: none; }
+.previa-jugador-nombre { font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.previa-rol-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: var(--oro-vivo);
+  color: var(--negro);
+  padding: 1px 6px;
+  border-radius: 8px;
+}
+.previa-rookie-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: var(--verde-claro);
+  color: white;
+  padding: 1px 6px;
+  border-radius: 8px;
+}
+.previa-jugador-stats {
+  color: var(--gris);
+  font-size: 0.8rem;
+  text-align: right;
+}
+.previa-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.previa-stat-card {
+  background: white;
+  border-radius: 10px;
+  padding: 14px;
+  text-align: center;
+  box-shadow: 0 2px 8px var(--sombra);
+}
+.previa-stat-card .num { font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:700; color:var(--verde); }
+.previa-stat-card .label { font-family:'Barlow Condensed',sans-serif; font-size:0.68rem; color:var(--gris); text-transform:uppercase; letter-spacing:0.06em; margin-top:2px; }
+.previa-curiosidad {
+  background: var(--crema);
+  border-left: 3px solid var(--oro);
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  border-radius: 0 6px 6px 0;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.88rem;
+}
 
 .edicion-detalle { display: none; }
 .edicion-detalle.visible { display: block; }
@@ -1068,14 +1225,20 @@ function buildHome() {
 // ═══════════════════════════════════════════════
 function buildTimeline() {
   const wrap = document.getElementById('year-timeline');
-  wrap.innerHTML = D.ediciones.map(e => `
-    <button class="year-btn ${!e.jugada ? 'no-jugada' : ''}" 
+  wrap.innerHTML = D.ediciones.map(e => {
+    const clicable = e.estado !== 'no_celebrada';
+    const titulo = e.estado === 'no_celebrada' ? 'No celebrada (COVID)'
+      : e.estado === 'futura' ? 'Próxima edición — previa'
+      : e.estado === 'historica_parcial' ? `Campeón: ${e.campeonConocido || '—'} (datos parciales)`
+      : `${e.equipoA?.nombre || '—'} vs ${e.equipoB?.nombre || '—'}`;
+    return `
+    <button class="year-btn ${!clicable ? 'no-jugada' : ''} ${e.estado === 'futura' ? 'futura' : ''}"
             id="ybtn-${e.edicion}"
-            onclick="${e.jugada ? `selectEdicion(${e.edicion})` : ''}"
-            title="${!e.jugada ? 'No celebrada (COVID)' : e.equipoA?.nombre + ' vs ' + e.equipoB?.nombre}">
+            onclick="${clicable ? `selectEdicion(${e.edicion})` : ''}"
+            title="${titulo}">
       ${e.año}
-    </button>
-  `).join('');
+    </button>`;
+  }).join('');
 }
 
 function selectEdicion(num) {
@@ -1089,8 +1252,109 @@ function selectEdicion(num) {
 // ═══════════════════════════════════════════════
 function renderEdicion(num) {
   const e = D.ediciones.find(e => e.edicion === num);
-  if (!e || !e.jugada) return;
+  if (!e) return;
+  if (e.estado === 'historica_parcial') return renderEdicionHistorica(e);
+  if (e.estado === 'futura') return renderEdicionPrevia(e);
+  return renderEdicionCelebrada(e);
+}
 
+function renderEdicionHistorica(e) {
+  const html = `
+    <div class="edicion-especial">
+      <span class="badge-estado badge-historica">Datos parciales</span>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.85rem;color:var(--gris);letter-spacing:0.05em">EDICIÓN ${e.edicion} · ${e.año}</div>
+      <div class="campeon-conocido">🏆 ${e.campeonConocido || 'Campeón desconocido'}</div>
+      ${e.notaHistorica ? `<p class="nota">${e.notaHistorica}</p>` : ''}
+      ${e.plantillaConocida && e.plantillaConocida.length ? `
+        <div style="margin-top:20px">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gris);margin-bottom:8px">Jugadores conocidos de esta edición</div>
+          <div class="plantilla-tags">
+            ${e.plantillaConocida.map(n => `<span class="plantilla-tag">${n}</span>`).join('')}
+          </div>
+        </div>` : ''}
+    </div>
+  `;
+  const det = document.getElementById('edicion-detalle');
+  det.innerHTML = html;
+  det.classList.add('visible');
+}
+
+function renderEdicionPrevia(e) {
+  const pstats = computePlayerStats();
+
+  function jugadorRow(p) {
+    const s = pstats[p.num] || {};
+    const esRookie = !s.ediciones || s.ediciones === 0;
+    const rolHtml = p.rol ? `<span class="previa-rol-tag">${p.rol}</span>` : (esRookie ? `<span class="previa-rookie-tag">Debut</span>` : '');
+    const statsTxt = esRookie ? 'Sin historial' : `${s.ediciones} ed. · ${s.copas} 🏆 · ${s.pts.toFixed(1)} pts`;
+    return `<div class="previa-jugador-row">
+      <div class="previa-jugador-nombre">${p.mote} ${rolHtml}</div>
+      <div class="previa-jugador-stats">${statsTxt}</div>
+    </div>`;
+  }
+
+  function teamCard(eq, bg) {
+    const txt = COLOR_LIGHT.has(eq?.color1) ? 'var(--negro)' : 'white';
+    const headerBg = eq?.color1 ? colorHex(eq.color1) : bg;
+    const headerTxt = eq?.color1 ? txt : 'white';
+    return `<div class="previa-team-card">
+      <div class="previa-team-header" style="background:${headerBg};color:${headerTxt}">
+        <div class="previa-team-nombre">${eq.nombre}</div>
+        <div class="previa-team-cap">Cap: ${eq.capitan} · Vice: ${eq.vicecapitan}</div>
+      </div>
+      ${eq.plantilla.map(jugadorRow).join('')}
+    </div>`;
+  }
+
+  // Stats agregadas del campo
+  const todos = [...e.equipoA.plantilla, ...e.equipoB.plantilla];
+  const rookies = todos.filter(p => !pstats[p.num] || pstats[p.num].ediciones === 0);
+  const veteranos = todos.filter(p => pstats[p.num] && pstats[p.num].ediciones > 0);
+  const totalCopas = todos.reduce((acc,p) => acc + (pstats[p.num]?.copas || 0), 0);
+  const masCopas = [...veteranos].sort((a,b) => (pstats[b.num]?.copas||0) - (pstats[a.num]?.copas||0))[0];
+  const masEdiciones = [...veteranos].sort((a,b) => (pstats[b.num]?.ediciones||0) - (pstats[a.num]?.ediciones||0))[0];
+  const masPuntos = [...veteranos].sort((a,b) => (pstats[b.num]?.pts||0) - (pstats[a.num]?.pts||0))[0];
+
+  const curiosidades = [];
+  if (masCopas) curiosidades.push(`<strong>${masCopas.mote}</strong> es quien más copas ha ganado del campo: ${pstats[masCopas.num].copas} ediciones.`);
+  if (masEdiciones) curiosidades.push(`<strong>${masEdiciones.mote}</strong> es el más veterano: ${pstats[masEdiciones.num].ediciones} ediciones jugadas.`);
+  if (rookies.length) curiosidades.push(`Hay <strong>${rookies.length} debutantes</strong> este año: ${rookies.map(p=>p.mote).join(', ')}.`);
+  if (masPuntos) curiosidades.push(`<strong>${masPuntos.mote}</strong> es el máximo anotador histórico del campo con ${pstats[masPuntos.num].pts.toFixed(1)} puntos.`);
+
+  const html = `
+    <div class="edicion-especial" style="margin-bottom:20px">
+      <span class="badge-estado badge-futura">⛳ Próxima edición</span>
+      <div style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;color:var(--verde);margin:8px 0">
+        ${e.equipoA.nombre} <span style="color:var(--gris);font-weight:400">vs</span> ${e.equipoB.nombre}
+      </div>
+      <p class="nota">Edición ${e.edicion} · ${e.año} · Emparejamientos y hándicaps aún por confirmar. Esta es una previa basada en el histórico de cada jugador.</p>
+    </div>
+
+    <div class="previa-stat-grid">
+      <div class="previa-stat-card"><div class="num">${todos.length}</div><div class="label">Jugadores</div></div>
+      <div class="previa-stat-card"><div class="num">${rookies.length}</div><div class="label">Debutantes</div></div>
+      <div class="previa-stat-card"><div class="num">${totalCopas}</div><div class="label">Copas combinadas</div></div>
+    </div>
+
+    <div class="previa-roster">
+      ${teamCard(e.equipoA, 'var(--verde)')}
+      ${teamCard(e.equipoB, 'var(--oro)')}
+    </div>
+
+    <div class="jornada-section">
+      <div class="jornada-header"><div class="jornada-titulo">Curiosidades del campo</div></div>
+      <div style="padding:16px 20px">
+        ${curiosidades.map(c => `<div class="previa-curiosidad">${c}</div>`).join('')}
+      </div>
+    </div>
+  `;
+  const det = document.getElementById('edicion-detalle');
+  det.innerHTML = html;
+  det.classList.add('visible');
+}
+
+function renderEdicionCelebrada(e) {
+  const num = e.edicion;
   const st = computeEdicionStats(num);
   const codA = e.equipoA?.cod;
   const ganadorA = st.totalA >= st.totalB;
@@ -1238,6 +1502,21 @@ function renderEdicion(num) {
 function buildMerito() {
   const tbody = document.getElementById('om-tbody');
   const rows = [];
+
+  // Filas históricas parciales (2005, 2006) primero — quedan al final tras el reverse()
+  D.ediciones.filter(e => e.estado === 'historica_parcial').forEach(e => {
+    rows.push(`
+      <tr>
+        <td class="om-año" style="border-left:5px solid var(--gris-claro)">${e.año}</td>
+        <td style="color:var(--gris);font-family:'Barlow Condensed'">Ed. ${e.edicion}</td>
+        <td><span class="resultado-pill pill-E" style="background:var(--gris-claro);color:var(--gris)">🏆</span></td>
+        <td class="om-equipo">${e.campeonConocido || '—'} <span style="font-size:0.72rem;color:var(--gris);font-weight:400">(datos parciales)</span></td>
+        <td style="color:var(--gris)">—</td>
+        <td style="color:var(--gris)">—</td>
+        <td style="color:var(--gris)">—</td>
+      </tr>
+    `);
+  });
 
   D.ediciones.filter(e => e.jugada && D.individuales.some(r=>r.edicion===e.edicion)).forEach(e => {
     const st = computeEdicionStats(e.edicion);
