@@ -1042,7 +1042,7 @@ table.ranking-table tr:last-child td { border-bottom: none; }
   </section>
 
   <div style="text-align:center;padding:20px;font-family:'Barlow Condensed',sans-serif;font-size:0.75rem;color:var(--gris);letter-spacing:0.05em">
-    Rizkider Cup · versión v2.1 — predicción con probabilidades por jornada · actualizado 03-jul
+    Rizkider Cup · versión v2.2 — marcadores por jornada coherentes con el total · actualizado 03-jul
   </div>
 </main>
 
@@ -1535,9 +1535,24 @@ function buildPrediccionHTML(e, pstats) {
 
   // Marcadores esperados redondeados a 0.5
   function rnd5(v){return Math.round(v*2)/2;}
+  // Redondear jornadas primero, y el total = suma de jornadas (coherencia garantizada)
   const expAp=rnd5(sAp/N), expBp=8-expAp;
   const expAi=rnd5(sAi/N), expBi=16-expAi;
-  const expAt=rnd5((sAp+sAi)/N), expBt=24-expAt;
+  // El total DEBE ser la suma de las jornadas, no un redondeo independiente
+  let expAt=expAp+expAi, expBt=expBp+expBi;
+  // Si ambas jornadas quedan empatadas pero la probabilidad global tiene favorito claro,
+  // desnivelar la jornada más ajustada medio punto hacia el favorito
+  if (expAt === expBt && Math.abs(wAt-wBt) > N*0.04) {
+    const favA = wAt > wBt;
+    // ¿qué jornada está más cerca de desnivelarse? la de menor margen relativo
+    const margenPar = Math.abs(sAp-sBp), margenInd = Math.abs(sAi-sBi);
+    if (margenPar <= margenInd) {
+      if (favA) { expAp+=0.5; expBp-=0.5; } else { expBp+=0.5; expAp-=0.5; }
+    } else {
+      if (favA) { expAi+=0.5; expBi-=0.5; } else { expBi+=0.5; expAi-=0.5; }
+    }
+    expAt=expAp+expAi; expBt=expBp+expBi;
+  }
 
   // Colores
   const bgA=e.equipoA.color1?colorHex(e.equipoA.color1):'var(--verde)';
