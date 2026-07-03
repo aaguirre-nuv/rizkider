@@ -1628,23 +1628,7 @@ function buildPrediccionHTML(e, pstats) {
         }).join('')}
       </div>
 
-      <!-- Parejas sugeridas (sin resultados) -->
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gris);margin-bottom:8px">
-        Parejas sugeridas — priorizando combinaciones novedosas
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
-        ${[['A',pairsA,e.equipoA,bgA,txtA],['B',pairsB,e.equipoB,bgB,txtB]].map(([side,pairs,eq,bg,txt])=>`
-        <div style="background:white;border-radius:8px;box-shadow:0 1px 6px var(--sombra);overflow:hidden">
-          <div style="background:${bg};color:${txt};padding:8px 14px;font-family:'Barlow Condensed',sans-serif;font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">${eq.nombre}</div>
-          ${pairs.map(([p1,p2],i)=>`
-          <div style="padding:7px 14px;border-bottom:1px solid var(--gris-claro);font-family:'Barlow Condensed',sans-serif;font-size:0.85rem;display:flex;align-items:center;gap:6px">
-            <span style="color:var(--gris);font-size:0.72rem;width:18px">${i+1}.</span>
-            <span style="font-weight:600">${p1.mote}</span>
-            <span style="color:var(--gris)">&</span>
-            <span style="font-weight:600">${p2.mote}</span>
-          </div>`).join('')}
-        </div>`).join('')}
-      </div>
+
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.72rem;color:var(--gris);text-align:center;padding-top:8px;border-top:1px solid var(--gris-claro)">
         ⚠️ Predicción estadística para pasar el rato. El golf siempre sorprende — debutantes, forma del día y los nervios no se calculan.
       </div>
