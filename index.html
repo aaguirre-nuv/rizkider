@@ -362,6 +362,7 @@ main { max-width: 1100px; margin: 0 auto; padding: 32px 24px 64px; }
   grid-template-columns: 1fr 1fr;
   gap: 20px;
   margin-bottom: 24px;
+  align-items: start;
 }
 .previa-team-card {
   background: white;
@@ -372,6 +373,10 @@ main { max-width: 1100px; margin: 0 auto; padding: 32px 24px 64px; }
 .previa-team-header {
   padding: 18px 20px;
   text-align: center;
+  min-height: 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .previa-team-nombre {
   font-family: 'Playfair Display', serif;
@@ -1297,12 +1302,20 @@ function renderEdicionPrevia(e) {
     const txt = COLOR_LIGHT.has(eq?.color1) ? 'var(--negro)' : 'white';
     const headerBg = eq?.color1 ? colorHex(eq.color1) : bg;
     const headerTxt = eq?.color1 ? txt : 'white';
+    // Ordenar: Capitán primero, Vicecapitán segundo, resto por copas desc
+    const rolOrder = {'Capitán': 0, 'Vicecapitán': 1};
+    const plantillaOrdenada = [...eq.plantilla].sort((a, b) => {
+      const rA = rolOrder[a.rol] ?? 2;
+      const rB = rolOrder[b.rol] ?? 2;
+      if (rA !== rB) return rA - rB;
+      return (pstats[b.num]?.copas || 0) - (pstats[a.num]?.copas || 0);
+    });
     return `<div class="previa-team-card">
       <div class="previa-team-header" style="background:${headerBg};color:${headerTxt}">
         <div class="previa-team-nombre">${eq.nombre}</div>
         <div class="previa-team-cap">Cap: ${eq.capitan} · Vice: ${eq.vicecapitan}</div>
       </div>
-      ${eq.plantilla.map(jugadorRow).join('')}
+      ${plantillaOrdenada.map(jugadorRow).join('')}
     </div>`;
   }
 
@@ -1315,11 +1328,39 @@ function renderEdicionPrevia(e) {
   const masEdiciones = [...veteranos].sort((a,b) => (pstats[b.num]?.ediciones||0) - (pstats[a.num]?.ediciones||0))[0];
   const masPuntos = [...veteranos].sort((a,b) => (pstats[b.num]?.pts||0) - (pstats[a.num]?.pts||0))[0];
 
+  // Helpers para empates — muestra todos los que comparten el máximo
+  function topTodos(lista, fn) {
+    if (!lista.length) return [];
+    const max = Math.max(...lista.map(fn));
+    return lista.filter(p => fn(p) === max);
+  }
+  function nombresLista(arr) {
+    if (arr.length === 1) return `<strong>${arr[0].mote}</strong>`;
+    const init = arr.slice(0,-1).map(p=>`<strong>${p.mote}</strong>`).join(', ');
+    return `${init} y <strong>${arr[arr.length-1].mote}</strong>`;
+  }
+
   const curiosidades = [];
-  if (masCopas) curiosidades.push(`<strong>${masCopas.mote}</strong> es quien más copas ha ganado del campo: ${pstats[masCopas.num].copas} ediciones.`);
-  if (masEdiciones) curiosidades.push(`<strong>${masEdiciones.mote}</strong> es el más veterano: ${pstats[masEdiciones.num].ediciones} ediciones jugadas.`);
-  if (rookies.length) curiosidades.push(`Hay <strong>${rookies.length} debutantes</strong> este año: ${rookies.map(p=>p.mote).join(', ')}.`);
-  if (masPuntos) curiosidades.push(`<strong>${masPuntos.mote}</strong> es el máximo anotador histórico del campo con ${pstats[masPuntos.num].pts.toFixed(1)} puntos.`);
+
+  const topCopas = topTodos(veteranos, p => pstats[p.num]?.copas || 0);
+  if (topCopas.length) {
+    const n = pstats[topCopas[0].num].copas;
+    curiosidades.push(`${nombresLista(topCopas)} ${topCopas.length>1?'son los que más copas han ganado':'es quien más copas ha ganado'} del campo: ${n} edición${n>1?'es':''}.`);
+  }
+
+  const topEdic = topTodos(veteranos, p => pstats[p.num]?.ediciones || 0);
+  if (topEdic.length) {
+    const n = pstats[topEdic[0].num].ediciones;
+    curiosidades.push(`${nombresLista(topEdic)} ${topEdic.length>1?'son los más veteranos':'es el más veterano'}: ${n} ediciones jugadas.`);
+  }
+
+  if (rookies.length) curiosidades.push(`Hay <strong>${rookies.length} debutante${rookies.length>1?'s':''}</strong> este año: ${rookies.map(p=>p.mote).join(', ')}.`);
+
+  const topPuntos = topTodos(veteranos, p => pstats[p.num]?.pts || 0);
+  if (topPuntos.length) {
+    const n = pstats[topPuntos[0].num].pts.toFixed(1);
+    curiosidades.push(`${nombresLista(topPuntos)} ${topPuntos.length>1?'son los máximos anotadores históricos':'es el máximo anotador histórico'} del campo con ${n} puntos.`);
+  }
 
   const html = `
     <div class="edicion-especial" style="margin-bottom:20px">
