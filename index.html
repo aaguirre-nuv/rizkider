@@ -1053,6 +1053,7 @@ const COLOR_MAP = {
   'Negro': '#1A1A1A', 'Marrón': '#92400E', 'Turquesa': '#0891B2',
   'AzulOscuro': '#1E3A8A', 'Marino': '#1E3A8A',
   'Crema': '#F5F0E0', 'Lima': '#84CC16',
+  'VerdeLima': '#4CAF3F', 'GrisPlata': '#8E9BAA',
 };
 // Colores que necesitan texto oscuro encima
 const COLOR_LIGHT = new Set(['Blanco','Amarillo','Rosa','Crema','Beige','Lima']);
@@ -1388,11 +1389,241 @@ function renderEdicionPrevia(e) {
         ${curiosidades.map(c => `<div class="previa-curiosidad">${c}</div>`).join('')}
       </div>
     </div>
+
+    <div id="prediccion-block">${buildPrediccionHTML(e, pstats)}</div>
   `;
   const det = document.getElementById('edicion-detalle');
   det.innerHTML = html;
   det.classList.add('visible');
 }
+
+function buildPrediccionHTML(e, pstats) {
+
+  // ── PRNG determinista (semilla fija = fecha del torneo 2026) ──
+  // Todos ven el mismo resultado. Mulberry32.
+  function mkRNG(seed) {
+    return function() {
+      seed = (seed + 0x6D2B79F5) >>> 0;
+      let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  const rng = mkRNG(20260705); // 5-julio-2026, fijo para siempre
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length-1; i>0; i--) {
+      const j = Math.floor(rng()*(i+1));
+      [a[i],a[j]] = [a[j],a[i]];
+    }
+    return a;
+  }
+
+  // ── Ratings ──
+  const vets = Object.values(pstats).filter(s => s.ryders >= 5);
+  const avgWP  = vets.reduce((a,s) => a+(s.ganados+s.empatados*.5)/s.ryders, 0) / vets.length;
+  const avgPPR = vets.reduce((a,s) => a+s.pts/s.ryders, 0) / vets.length;
+  function rating(num) {
+    const s = pstats[num];
+    if (!s || s.ryders < 3) return 1.0;
+    const wp  = (s.ganados + s.empatados*.5) / s.ryders;
+    const ppr = s.pts / s.ryders;
+    return .55*(wp/avgWP) + .45*(ppr/avgPPR);
+  }
+
+  const pA = e.equipoA.plantilla.map(p => ({...p, r:rating(p.num)}));
+  const pB = e.equipoB.plantilla.map(p => ({...p, r:rating(p.num)}));
+
+  // ── Historial de parejas: contar veces que dos jugadores del mismo equipo han jugado juntos ──
+  function timesPlayedTogether(nums) {
+    const played = {};
+    nums.forEach(a => nums.forEach(b => {
+      if (a<b) played[`${a}-${b}`] = 0;
+    }));
+    D.parejas.forEach(r => {
+      [[r.jug1A,r.jug2A],[r.jug1B,r.jug2B]].forEach(pair => {
+        if (!pair[0]||!pair[1]) return;
+        const key = [pair[0],pair[1]].sort((a,b)=>a-b).join('-');
+        if (played[key] !== undefined) played[key]++;
+      });
+    });
+    return played;
+  }
+
+  // ── Crear parejas dentro de cada equipo ──
+  // Criterio: mínimas repeticiones históricas + equilibrio de nivel (fuerte+flojo)
+  function createPairings(players) {
+    const nums = players.map(p=>p.num);
+    const hist = timesPlayedTogether(nums);
+    // Ordenar por rating desc
+    const sorted = [...players].sort((a,b) => b.r-a.r);
+    const used = new Set();
+    const pairs = [];
+    for (let i=0; i<sorted.length; i++) {
+      if (used.has(sorted[i].num)) continue;
+      const p1 = sorted[i];
+      used.add(p1.num);
+      // Buscar el mejor compañero: penalizar repeticiones, preferir nivel complementario
+      // (el mejor jugador se empareja con un jugador más débil para equilibrar)
+      let best = null, bestScore = Infinity;
+      for (let j=i+1; j<sorted.length; j++) {
+        if (used.has(sorted[j].num)) continue;
+        const p2 = sorted[j];
+        const key = [p1.num,p2.num].sort((a,b)=>a-b).join('-');
+        const rep = hist[key] || 0;
+        // Preferir pares novedosos, con algo de aleatoriedad para el desempate
+        const score = rep*10 + rng()*2;
+        if (score < bestScore) { bestScore = score; best = {player:p2, idx:j}; }
+      }
+      if (best) { used.add(best.player.num); pairs.push([p1, best.player]); }
+    }
+    return pairs;
+  }
+
+  const pairsA = createPairings(pA);
+  const pairsB = createPairings(pB);
+
+  // ── Enfrentamientos por parejas (jornada 1) ──
+  // Emparejar pares de A vs pares de B: mayor rating A vs mayor rating B
+  const pairsASorted = [...pairsA].sort((a,b) => (b[0].r+b[1].r)-(a[0].r+a[1].r));
+  const pairsBSorted = [...pairsB].sort((a,b) => (b[0].r+b[1].r)-(a[0].r+a[1].r));
+  const matchesPar = pairsASorted.map((pa,i) => [pa, pairsBSorted[i]]);
+
+  // ── Enfrentamientos individuales (jornada 2) ──
+  // Orden aproximado por rating, con algo de mezcla (seeded)
+  const indA = [...pA].sort((a,b) => b.r-a.r);
+  const indB = [...pB].sort((a,b) => b.r-a.r);
+  // Pequeño shuffle controlado: intercambiar algunos adyacentes
+  for (let i=0; i<indB.length-1; i+=3) {
+    if (rng() > 0.6) [indB[i], indB[i+1]] = [indB[i+1], indB[i]];
+  }
+  const matchesInd = indA.map((p,i) => [p, indB[i]]);
+
+  // ── Simular resultado de un partido ──
+  function simMatch(rA, rB) {
+    const p = rA/(rA+rB);
+    const x = rng();
+    if (x < p-0.06) return {ptA:1, ptB:0, res:'1'};
+    if (x < p+0.06) return {ptA:.5, ptB:.5, res:'½'};
+    return {ptA:0, ptB:1, res:'1'};
+  }
+
+  // ── Calcular resultados ──
+  let totalPA=0, totalPB=0;
+  const resPar = matchesPar.map(([pa,pb]) => {
+    const rA = (pa[0].r + pa[1].r)/2;
+    const rB = (pb[0].r + pb[1].r)/2;
+    const m = simMatch(rA, rB);
+    totalPA += m.ptA; totalPB += m.ptB;
+    return {...m, pa, pb};
+  });
+  let indPA=0, indPB=0;
+  const resInd = matchesInd.map(([pa,pb]) => {
+    const m = simMatch(pa.r, pb.r);
+    totalPA += m.ptA; totalPB += m.ptB;
+    indPA += m.ptA; indPB += m.ptB;
+    return {...m, pa, pb};
+  });
+  const parPA = totalPA - indPA, parPB = totalPB - indPB;
+  const ganadorA = totalPA > totalPB;
+  const ganadorNom = ganadorA ? e.equipoA.nombre : e.equipoB.nombre;
+
+  // ── Helpers visuales ──
+  const bgA = colorHex(e.equipoA.color1) || 'var(--verde)';
+  const bgB = colorHex(e.equipoB.color1) || 'var(--gris)';
+  const txtA = COLOR_LIGHT.has(e.equipoA.color1) ? 'var(--negro)' : 'white';
+  const txtB = COLOR_LIGHT.has(e.equipoB.color1) ? 'var(--negro)' : 'white';
+  const bgWin = ganadorA ? bgA : bgB;
+  const txtWin = ganadorA ? txtA : txtB;
+
+  function ratingBar(r) {
+    const pct = Math.min(Math.round(r*50), 100);
+    const col = r>=1.15?'var(--verde)':r>=0.85?'var(--oro-claro)':'#dc2626';
+    return `<div style="display:inline-block;background:var(--gris-claro);border-radius:3px;height:5px;width:48px;vertical-align:middle">
+      <div style="background:${col};height:5px;border-radius:3px;width:${pct}%"></div></div>`;
+  }
+
+  function matchRow(pa, pb, res, isInd) {
+    const winA = res.ptA > res.ptB, winB = res.ptB > res.ptA;
+    const pill = res.ptA===res.ptB
+      ? `<span style="background:var(--gris-claro);color:var(--gris);font-size:0.72rem;font-family:'Barlow Condensed',sans-serif;font-weight:700;padding:2px 8px;border-radius:10px">AS</span>`
+      : `<span style="background:${winA?bgA:bgB};color:${winA?txtA:txtB};font-size:0.72rem;font-family:'Barlow Condensed',sans-serif;font-weight:700;padding:2px 8px;border-radius:10px">1</span>`;
+    const nameA = isInd ? pa.mote : `${pa[0].mote} & ${pa[1].mote}`;
+    const nameB = isInd ? pb.mote : `${pb[0].mote} & ${pb[1].mote}`;
+    return `<tr style="border-bottom:1px solid var(--gris-claro)">
+      <td style="padding:7px 14px;font-family:'Barlow Condensed',sans-serif;font-size:0.85rem;font-weight:${winA?700:400};${winA?`border-left:3px solid ${bgA}`:''}">${nameA}</td>
+      <td style="text-align:center;padding:7px 8px">${pill}</td>
+      <td style="padding:7px 14px;font-family:'Barlow Condensed',sans-serif;font-size:0.85rem;font-weight:${winB?700:400};text-align:right;${winB?`border-right:3px solid ${bgB}`:''}">${nameB}</td>
+      <td style="padding:7px 10px;font-family:'Barlow Condensed',sans-serif;font-size:0.8rem;color:var(--gris);text-align:right;white-space:nowrap">${res.ptA}–${res.ptB}</td>
+    </tr>`;
+  }
+
+  const anchoPct = p => Math.max(8, Math.round(p / (totalPA+totalPB) * 100));
+
+  return `
+  <div class="jornada-section" style="margin-top:20px">
+    <div class="jornada-header" style="background:linear-gradient(135deg,#1B5229,#2D7A3A)">
+      <div class="jornada-titulo">🎯 Predicción — Simulación estadística</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.75rem;color:rgba(255,255,255,0.6)">Basado en histórico real · emparejamientos simulados · resultado fijo</div>
+    </div>
+    <div style="padding:20px">
+
+      <!-- Veredicto -->
+      <div style="background:${bgWin};color:${txtWin};border-radius:8px;padding:16px 20px;text-align:center;margin-bottom:20px">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;opacity:0.8">Favorito según los datos</div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;margin-top:4px">${ganadorNom}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;margin-top:6px;opacity:0.9">${totalPA.toFixed(1)} – ${totalPB.toFixed(1)}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.78rem;opacity:0.75;margin-top:2px">Parejas: ${parPA}–${parPB} · Individual: ${indPA}–${indPB}</div>
+      </div>
+
+      <!-- Barra marcador -->
+      <div style="margin-bottom:24px">
+        <div style="display:flex;border-radius:8px;overflow:hidden;height:36px">
+          <div style="width:${anchoPct(totalPA)}%;background:${bgA};display:flex;align-items:center;justify-content:center;color:${txtA};font-family:'Playfair Display',serif;font-weight:700;font-size:1rem">${e.equipoA.nombre.split("'")[0]}</div>
+          <div style="width:${anchoPct(totalPB)}%;background:${bgB};display:flex;align-items:center;justify-content:center;color:${txtB};font-family:'Playfair Display',serif;font-weight:700;font-size:1rem">${e.equipoB.nombre.split("'")[0]}</div>
+        </div>
+      </div>
+
+      <!-- Jornada 1: Parejas -->
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gris);margin-bottom:8px">
+        Jornada 1 · Parejas (Greensome Chapman) — Resultado simulado: ${parPA}–${parPB}
+      </div>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:20px;background:white;border-radius:8px;overflow:hidden;box-shadow:0 1px 6px var(--sombra)">
+        <thead><tr style="background:var(--crema)">
+          <th style="padding:8px 14px;text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:0.7rem;letter-spacing:0.08em;color:var(--gris)">${e.equipoA.nombre}</th>
+          <th style="width:60px"></th>
+          <th style="padding:8px 14px;text-align:right;font-family:'Barlow Condensed',sans-serif;font-size:0.7rem;letter-spacing:0.08em;color:var(--gris)">${e.equipoB.nombre}</th>
+          <th style="width:50px"></th>
+        </tr></thead>
+        <tbody>${resPar.map(r=>matchRow(r.pa, r.pb, r, false)).join('')}</tbody>
+      </table>
+
+      <!-- Jornada 2: Individual -->
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gris);margin-bottom:8px">
+        Jornada 2 · Individual (Match Play) — Resultado simulado: ${indPA}–${indPB}
+      </div>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:16px;background:white;border-radius:8px;overflow:hidden;box-shadow:0 1px 6px var(--sombra)">
+        <thead><tr style="background:var(--crema)">
+          <th style="padding:8px 14px;text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:0.7rem;letter-spacing:0.08em;color:var(--gris)">${e.equipoA.nombre}</th>
+          <th style="width:60px"></th>
+          <th style="padding:8px 14px;text-align:right;font-family:'Barlow Condensed',sans-serif;font-size:0.7rem;letter-spacing:0.08em;color:var(--gris)">${e.equipoB.nombre}</th>
+          <th style="width:50px"></th>
+        </tr></thead>
+        <tbody>${resInd.map(r=>matchRow(r.pa, r.pb, r, true)).join('')}</tbody>
+      </table>
+
+      <!-- Nota sobre parejas novedosas -->
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.78rem;color:var(--gris);background:var(--crema);padding:10px 14px;border-radius:6px;margin-bottom:8px;line-height:1.5">
+        💡 Las parejas están simuladas priorizando combinaciones novedosas que no se han jugado antes. Los enfrentamientos individuales se han ordenado por nivel histórico aproximado.
+      </div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.72rem;color:var(--gris);text-align:center;padding-top:8px;border-top:1px solid var(--gris-claro)">
+        ⚠️ Predicción estadística para pasar el rato. El golf siempre sorprende — debutantes, forma del día y los nervios no se calculan.
+      </div>
+    </div>
+  </div>`;
+}
+
 
 function renderEdicionCelebrada(e) {
   const num = e.edicion;
