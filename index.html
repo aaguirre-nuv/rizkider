@@ -1042,7 +1042,7 @@ table.ranking-table tr:last-child td { border-bottom: none; }
   </section>
 
   <div style="text-align:center;padding:20px;font-family:'Barlow Condensed',sans-serif;font-size:0.75rem;color:var(--gris);letter-spacing:0.05em">
-    Rizkider Cup · versión v3.0 — enfrentamientos reales 2026 con hándicap y predicción por partido · actualizado 04-jul
+    Rizkider Cup · versión v3.2 — hándicap P1 corregido a 24 (Serch's) · actualizado 04-jul
   </div>
 </main>
 
@@ -1491,8 +1491,8 @@ function buildEnfrentamientosHTML(e) {
     const j1A=jugById[m.jug1A], j2A=jugById[m.jug2A], j1B=jugById[m.jug1B], j2B=jugById[m.jug2B];
     const rA=(rating2(m.jug1A)+rating2(m.jug2A))/2;
     const rB=(rating2(m.jug1B)+rating2(m.jug2B))/2;
-    const hA=hcpPareja(j1A.hcpJuego,j2A.hcpJuego);
-    const hB=hcpPareja(j1B.hcpJuego,j2B.hcpJuego);
+    const hA = m.hcpAOverride ?? hcpPareja(j1A.hcpJuego,j2A.hcpJuego);
+    const hB = m.hcpBOverride ?? hcpPareja(j1B.hcpJuego,j2B.hcpJuego);
     const p=rA/(rA+rB);
     const pE=tieProb(p);
     const resto=1-pE;
@@ -1510,10 +1510,20 @@ function buildEnfrentamientosHTML(e) {
       const tc=winA?txtA:winB?txtB:'var(--gris)';
       resultadoCol = `<span style="background:${bg};color:${tc};padding:5px 14px;border-radius:10px;font-weight:700;font-family:'Barlow Condensed',sans-serif;font-size:0.9rem">${txt}</span>`;
     } else {
-      resultadoCol = `<div style="display:flex;border-radius:6px;overflow:hidden;height:26px;width:100%;min-width:120px">
-        <div style="width:${pS}%;background:${bgA};display:flex;align-items:center;justify-content:center;color:${txtA};font-size:0.68rem;font-weight:700">${pS}%</div>
-        ${pEm>3?`<div style="width:${pEm}%;background:var(--gris-claro);display:flex;align-items:center;justify-content:center;color:var(--gris);font-size:0.58rem">${pEm}%</div>`:''}
-        <div style="width:${pN}%;background:${bgB};display:flex;align-items:center;justify-content:center;color:${txtB};font-size:0.68rem;font-weight:700">${pN}%</div>
+      const favoritoA = pS > pN;
+      const favoritoB = pN > pS;
+      // El lado favorito destaca (texto grande, negrita, color pleno);
+      // el lado no favorito se atenúa (texto pequeño, color apagado) — independiente del equipo
+      const styleA = favoritoA
+        ? `background:${bgA};color:${txtA};font-size:0.82rem;font-weight:800;box-shadow:inset 0 0 0 2px rgba(255,255,255,0.4)`
+        : `background:color-mix(in srgb,${bgA} 45%,#e8e8e8);color:color-mix(in srgb,${txtA} 55%,#888);font-size:0.6rem;font-weight:600;opacity:0.85`;
+      const styleB = favoritoB
+        ? `background:${bgB};color:${txtB};font-size:0.82rem;font-weight:800;box-shadow:inset 0 0 0 2px rgba(255,255,255,0.4)`
+        : `background:color-mix(in srgb,${bgB} 45%,#e8e8e8);color:color-mix(in srgb,${txtB} 55%,#888);font-size:0.6rem;font-weight:600;opacity:0.85`;
+      resultadoCol = `<div style="display:flex;border-radius:6px;overflow:hidden;height:28px;width:100%;min-width:120px">
+        <div style="width:${pS}%;display:flex;align-items:center;justify-content:center;${styleA}">${pS}%</div>
+        ${pEm>3?`<div style="width:${pEm}%;background:var(--gris-claro);display:flex;align-items:center;justify-content:center;color:var(--gris);font-size:0.56rem">${pEm}%</div>`:''}
+        <div style="width:${pN}%;display:flex;align-items:center;justify-content:center;${styleB}">${pN}%</div>
       </div>`;
     }
 
