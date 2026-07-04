@@ -78,7 +78,7 @@ body {
 }
 .team-headers {
   display: grid;
-  grid-template-columns: 1fr 70px 1fr;
+  grid-template-columns: 0.85fr 130px 0.85fr;
   gap: 4px;
   margin-top: 8px;
 }
@@ -96,18 +96,19 @@ body {
 .team-header.mid { background: #eee; font-size: 0.75rem; }
 .match-row {
   display: grid;
-  grid-template-columns: 1fr 70px 1fr;
+  grid-template-columns: 0.85fr 130px 0.85fr;
   gap: 4px;
-  margin-top: 5px;
+  margin-top: 4px;
   align-items: stretch;
 }
 .pair-box {
   border: 2px solid #999;
   border-radius: 6px;
-  padding: 5px 8px;
+  padding: 4px 8px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  min-height: 0;
 }
 .player-name {
   font-size: 1.15rem;
@@ -201,13 +202,121 @@ body {
 @media print {
   body { background: white; }
   .page { box-shadow: none; margin: 0; width: 100%; }
+  .page + .page { page-break-before: always; margin-top: 0; }
   @page { size: A4 portrait; margin: 8mm; }
+}
+
+.match-row-ind {
+  display: grid;
+  grid-template-columns: 0.55fr 105px 0.55fr;
+  gap: 4px;
+  margin-top: 3px;
+  align-items: stretch;
+}
+.pair-box-ind {
+  border: 2px solid #999;
+  border-radius: 6px;
+  padding: 3px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.player-name-ind {
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.15;
+}
+.pair-hcp-ind {
+  font-size: 0.62rem;
+  color: var(--oro);
+  font-weight: 700;
+  margin-left: 6px;
+  white-space: nowrap;
+}
+.result-box-ind {
+  border: 2px solid #999;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  padding: 3px 4px;
+  gap: 2px;
+}
+.pnum-hora-ind {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
 }
 </style>
 </head>
 <body>
 
 <div class="page">
+
+  <div class="header">
+    <div class="edicion">XXI Rizkider Cup — Edición 21</div>
+    <h1>RIZKI<span>DER</span> CUP 2026</h1>
+    <div class="sub">Izki-Urturi · Serch's Team vs NachEle's Team</div>
+  </div>
+
+  <div class="jornada-titulo">
+    <div class="dia">Segunda Jornada · Domingo</div>
+    <div class="formato">Individual · Match Play</div>
+  </div>
+
+  <div class="team-headers">
+    <div class="team-header" style="background:var(--verde-lima);color:white">Serch's Team</div>
+    <div class="team-header mid">RDO</div>
+    <div class="team-header" style="background:var(--gris-plata);color:var(--negro)">NachEle's Team</div>
+  </div>
+
+  <div class="match-row-ind"><div class="pair-box-ind"><span class="player-name-ind">J Vara</span><span class="pair-hcp-ind">HCP 19</span></div><div class="result-box-ind"><div class="pnum-hora-ind"><span class="pnum">I1</span><span style="font-size:0.95rem;color:var(--oro);font-weight:800">09:28</span></div><span class="diff-tag b">Serch's +3</span></div><div class="pair-box-ind"><span class="player-name-ind">Marga F.</span><span class="pair-hcp-ind">HCP 16</span></div></div>
+  <div class="match-row-ind"><div class="pair-box-ind"><span class="player-name-ind">JuanSanz</span><span class="pair-hcp-ind">HCP 23</span></div><div class="result-box-ind"><div class="pnum-hora-ind"><span class="pnum">I2</span><span style="font-size:0.95rem;color:var(--oro);font-weight:800">09:28</span></div><span class="diff-tag b">Serch's +3</span></div><div class="pair-box-ind"><span class="player-name-ind">Tom</span><span class="pair-hcp-ind">HCP 20</span></div></div>
+  <div class="match-row-ind"><div class="pair-box-ind"><span class="player-name-ind">Penny</span><span class="pair-hcp-ind">HCP 14</span></div><div class="result-box-ind"><div class="pnum-hora-ind"><span class="pnum">I3</span><span style="font-size:0.95rem;color:var(--oro);font-weight:800">09:36</span></div><span class="diff-tag b">Serch's +5</span></div><div class="pair-box-ind"><span class="player-name-ind">Alvarito</span><span class="pair-hcp-ind">HCP 9</span></div></div>
+  <div class="match-row-ind"><div class="pair-box-ind"><span class="player-name-ind">Emilio</span><span class="pair-hcp-ind">HCP 35</span></div><div class="result-box-ind"><div class="pnum-hora-ind"><span class="pnum">I4</span><span style="font-size:0.95rem;color:var(--oro);font-weight:800">09:36</span></div><span class="diff-tag b">Serch's +3</span></div><div class="pair-box-ind"><span class="player-name-ind">Juan M.</span><span class="pair-hcp-ind">HCP 32</span></div></div>
+  <div class="match-row-ind"><div class="pair-box-ind"><span class="player-name-ind">Joaco</span><span class="pair-hcp-ind">HCP 27</span></div><div class="result-box-ind"><div class="pnum-hora-ind"><span class="pnum">I5</span><span style="font-size:0.95rem;color:var(--oro);font-weight:800">09:44</span></div><span class="diff-tag b">Serch's +3</span></div><div class="pair-box-ind"><span class="player-name-ind">Ruslan</span><span class="pair-hcp-ind">HCP 24</span></div></div>
+  <div class="match-row-ind"><div class="pair-box-ind"><span class="player-name-ind">Alberto G.</span><span class="pair-hcp-ind">HCP 32</span></div><div class="result-box-ind"><div class="pnum-hora-ind"><span class="pnum">I6</span><span style="font-size:0.95rem;color:var(--oro);font-weight:800">09:44</span></div><span class="diff-tag a">NachEle +2</span></div><div class="pair-box-ind"><span class="player-name-ind">Alberto A.</span><span class="pair-hcp-ind">HCP 34</span></div></div>
+  <div class="match-row-ind"><div class="pair-box-ind"><span class="player-name-ind">Sergio</span><span class="pair-hcp-ind">HCP 5</span></div><div class="result-box-ind"><div class="pnum-hora-ind"><span class="pnum">I7</span><span style="font-size:0.95rem;color:var(--oro);font-weight:800">09:52</span></div><span class="diff-tag a">NachEle +3</span></div><div class="pair-box-ind"><span class="player-name-ind">Nachete</span><span class="pair-hcp-ind">HCP 8</span></div></div>
+  <div class="match-row-ind"><div class="pair-box-ind"><span class="player-name-ind">Marina</span><span class="pair-hcp-ind">HCP 20</span></div><div class="result-box-ind"><div class="pnum-hora-ind"><span class="pnum">I8</span><span style="font-size:0.95rem;color:var(--oro);font-weight:800">09:52</span></div><span class="diff-tag a">NachEle +7</span></div><div class="pair-box-ind"><span class="player-name-ind">Castillejo</span><span class="pair-hcp-ind">HCP 27</span></div></div>
+  <div class="match-row-ind"><div class="pair-box-ind"><span class="player-name-ind">JC Ibarra</span><span class="pair-hcp-ind">HCP 27</span></div><div class="result-box-ind"><div class="pnum-hora-ind"><span class="pnum">I9</span><span style="font-size:0.95rem;color:var(--oro);font-weight:800">10:00</span></div><span class="diff-tag a">NachEle +1</span></div><div class="pair-box-ind"><span class="player-name-ind">Elena</span><span class="pair-hcp-ind">HCP 28</span></div></div>
+  <div class="match-row-ind"><div class="pair-box-ind"><span class="player-name-ind">Roberto</span><span class="pair-hcp-ind">HCP 31</span></div><div class="result-box-ind"><div class="pnum-hora-ind"><span class="pnum">I10</span><span style="font-size:0.95rem;color:var(--oro);font-weight:800">10:00</span></div><span class="diff-tag a">NachEle +2</span></div><div class="pair-box-ind"><span class="player-name-ind">Mike</span><span class="pair-hcp-ind">HCP 33</span></div></div>
+  <div class="match-row-ind"><div class="pair-box-ind"><span class="player-name-ind">Alvero</span><span class="pair-hcp-ind">HCP 10</span></div><div class="result-box-ind"><div class="pnum-hora-ind"><span class="pnum">I11</span><span style="font-size:0.95rem;color:var(--oro);font-weight:800">10:08</span></div><span class="diff-tag b">Serch's +7</span></div><div class="pair-box-ind"><span class="player-name-ind">Lucas</span><span class="pair-hcp-ind">HCP 3</span></div></div>
+  <div class="match-row-ind"><div class="pair-box-ind"><span class="player-name-ind">Carmen</span><span class="pair-hcp-ind">HCP 42</span></div><div class="result-box-ind"><div class="pnum-hora-ind"><span class="pnum">I12</span><span style="font-size:0.95rem;color:var(--oro);font-weight:800">10:08</span></div><span class="diff-tag b">Serch's +13</span></div><div class="pair-box-ind"><span class="player-name-ind">Javier A.</span><span class="pair-hcp-ind">HCP 29</span></div></div>
+  <div class="match-row-ind"><div class="pair-box-ind"><span class="player-name-ind">Franck</span><span class="pair-hcp-ind">HCP 19</span></div><div class="result-box-ind"><div class="pnum-hora-ind"><span class="pnum">I13</span><span style="font-size:0.95rem;color:var(--oro);font-weight:800">10:16</span></div><span class="diff-tag a">NachEle +9</span></div><div class="pair-box-ind"><span class="player-name-ind">Marta</span><span class="pair-hcp-ind">HCP 28</span></div></div>
+  <div class="match-row-ind"><div class="pair-box-ind"><span class="player-name-ind">Emi</span><span class="pair-hcp-ind">HCP 31</span></div><div class="result-box-ind"><div class="pnum-hora-ind"><span class="pnum">I14</span><span style="font-size:0.95rem;color:var(--oro);font-weight:800">10:16</span></div><span class="diff-tag a">NachEle +2</span></div><div class="pair-box-ind"><span class="player-name-ind">Anabel</span><span class="pair-hcp-ind">HCP 33</span></div></div>
+  <div class="match-row-ind"><div class="pair-box-ind"><span class="player-name-ind">Pablo R.</span><span class="pair-hcp-ind">HCP 13</span></div><div class="result-box-ind"><div class="pnum-hora-ind"><span class="pnum">I15</span><span style="font-size:0.95rem;color:var(--oro);font-weight:800">10:24</span></div><span class="diff-tag a">NachEle +2</span></div><div class="pair-box-ind"><span class="player-name-ind">Romain</span><span class="pair-hcp-ind">HCP 15</span></div></div>
+  <div class="match-row-ind"><div class="pair-box-ind"><span class="player-name-ind">Antonio M.</span><span class="pair-hcp-ind">HCP 32</span></div><div class="result-box-ind"><div class="pnum-hora-ind"><span class="pnum">I16</span><span style="font-size:0.95rem;color:var(--oro);font-weight:800">10:24</span></div><span class="diff-tag a">NachEle +10</span></div><div class="pair-box-ind"><span class="player-name-ind">Marga</span><span class="pair-hcp-ind">HCP 42</span></div></div>
+
+  <div class="nota-hcp">Diferencia de golpes = hándicap de juego individual · el jugador con más hándicap recibe la diferencia</div>
+
+  <div class="totales">
+    <div class="parcial-block">
+      <div class="parcial-box"><div class="label">Parcial Serch's</div><div class="valor">&nbsp;</div></div>
+      <div class="parcial-box"><div class="label">Parcial NachEle's</div><div class="valor">&nbsp;</div></div>
+    </div>
+  </div>
+
+  <div class="total-final">
+    <div class="team-name">Serch's Team</div>
+    <div class="score-boxes">
+      <div class="score-box">&nbsp;</div>
+      <div class="vs">–</div>
+      <div class="score-box">&nbsp;</div>
+    </div>
+    <div class="team-name">NachEle's Team</div>
+  </div>
+
+  <div class="capitanes">
+    <div>Capitán: Sergio Sáez · Vicecapitán: Joaco Sánchez</div>
+    <div>Capitán: Nacho Casas · Vicecapitana: Elena Llorente</div>
+  </div>
+
+</div>
+
+<div class="page" style="margin-top:20px">
 
   <div class="header">
     <div class="edicion">XXI Rizkider Cup — Edición 21</div>
@@ -229,96 +338,56 @@ body {
   <div class="match-row">
     <div class="pair-box"><div class="player-name">Franck</div><div class="player-name">Carmen Gayo</div><div class="pair-hcp">HCP 24</div></div>
     <div class="result-box"><span class="pnum">P1</span><div class="result-line"></div>
-      <div style="display:flex;width:100%;height:12px;border-radius:3px;overflow:hidden;margin-top:3px">
-        <div style="width:41%;background:#8B93A0"></div>
-        <div style="width:14%;background:#ddd"></div>
-        <div style="width:45%;background:#4CAF3F"></div>
-      </div>
-      <div style="font-size:0.52rem;color:#888;text-align:center;margin-top:1px">41%–14%–45%</div><span class="diff-tag b">NachEle +1</span></div>
+      <div style="background:#4CAF3F;color:white;padding:5px 10px;border-radius:8px;font-weight:800;font-family:'Barlow Condensed',sans-serif;font-size:1rem;text-align:center;margin-top:4px">3&2</div><span class="diff-tag b">NachEle +1</span></div>
     <div class="pair-box"><div class="player-name">Castillejo</div><div class="player-name">Alberto A.</div><div class="pair-hcp">HCP 25</div></div>
   </div>
 
   <div class="match-row">
     <div class="pair-box"><div class="player-name">Emi</div><div class="player-name">Joaco</div><div class="pair-hcp">HCP 24</div></div>
     <div class="result-box"><span class="pnum">P2</span><div class="result-line"></div>
-      <div style="display:flex;width:100%;height:12px;border-radius:3px;overflow:hidden;margin-top:3px">
-        <div style="width:49%;background:#8B93A0"></div>
-        <div style="width:13%;background:#ddd"></div>
-        <div style="width:37%;background:#4CAF3F"></div>
-      </div>
-      <div style="font-size:0.52rem;color:#888;text-align:center;margin-top:1px">49%–13%–37%</div><span class="diff-tag a">Serch's +2</span></div>
+      <div style="background:#C2CDD6;color:#0D1A0F;padding:5px 10px;border-radius:8px;font-weight:800;font-family:'Barlow Condensed',sans-serif;font-size:1rem;text-align:center;margin-top:4px">6&5</div><span class="diff-tag a">Serch's +2</span></div>
     <div class="pair-box"><div class="player-name">Ruslan</div><div class="player-name">Javier A.</div><div class="pair-hcp">HCP 22</div></div>
   </div>
 
   <div class="match-row">
     <div class="pair-box"><div class="player-name">Sergio Sáez</div><div class="player-name">JC Ibarra</div><div class="pair-hcp">HCP 12</div></div>
     <div class="result-box"><span class="pnum">P3</span><div class="result-line"></div>
-      <div style="display:flex;width:100%;height:12px;border-radius:3px;overflow:hidden;margin-top:3px">
-        <div style="width:40%;background:#8B93A0"></div>
-        <div style="width:14%;background:#ddd"></div>
-        <div style="width:46%;background:#4CAF3F"></div>
-      </div>
-      <div style="font-size:0.52rem;color:#888;text-align:center;margin-top:1px">40%–14%–46%</div><span class="diff-tag b">NachEle +15</span></div>
+      <div style="background:#C2CDD6;color:#0D1A0F;padding:5px 10px;border-radius:8px;font-weight:800;font-family:'Barlow Condensed',sans-serif;font-size:1rem;text-align:center;margin-top:4px">3&2</div><span class="diff-tag b">NachEle +15</span></div>
     <div class="pair-box"><div class="player-name">Juan Montón</div><div class="player-name">Mike</div><div class="pair-hcp">HCP 27</div></div>
   </div>
 
   <div class="match-row">
     <div class="pair-box"><div class="player-name">J Vara</div><div class="player-name">JuanSanz</div><div class="pair-hcp">HCP 17</div></div>
     <div class="result-box"><span class="pnum">P4</span><div class="result-line"></div>
-      <div style="display:flex;width:100%;height:12px;border-radius:3px;overflow:hidden;margin-top:3px">
-        <div style="width:49%;background:#8B93A0"></div>
-        <div style="width:13%;background:#ddd"></div>
-        <div style="width:37%;background:#4CAF3F"></div>
-      </div>
-      <div style="font-size:0.52rem;color:#888;text-align:center;margin-top:1px">49%–13%–37%</div><span class="diff-tag a">Serch's +4</span></div>
+      <div style="background:#4CAF3F;color:white;padding:5px 10px;border-radius:8px;font-weight:800;font-family:'Barlow Condensed',sans-serif;font-size:1rem;text-align:center;margin-top:4px">8&6</div><span class="diff-tag a">Serch's +4</span></div>
     <div class="pair-box"><div class="player-name">Nachete</div><div class="player-name">Elena</div><div class="pair-hcp">HCP 13</div></div>
   </div>
 
   <div class="match-row">
     <div class="pair-box"><div class="player-name">Antonio M.</div><div class="player-name">Alberto G.</div><div class="pair-hcp">HCP 27</div></div>
     <div class="result-box"><span class="pnum">P5</span><div class="result-line"></div>
-      <div style="display:flex;width:100%;height:12px;border-radius:3px;overflow:hidden;margin-top:3px">
-        <div style="width:45%;background:#8B93A0"></div>
-        <div style="width:14%;background:#ddd"></div>
-        <div style="width:41%;background:#4CAF3F"></div>
-      </div>
-      <div style="font-size:0.52rem;color:#888;text-align:center;margin-top:1px">45%–14%–41%</div><span class="diff-tag a">Serch's +14</span></div>
+      <div style="background:#4CAF3F;color:white;padding:5px 10px;border-radius:8px;font-weight:800;font-family:'Barlow Condensed',sans-serif;font-size:1rem;text-align:center;margin-top:4px">2&1</div><span class="diff-tag a">Serch's +14</span></div>
     <div class="pair-box"><div class="player-name">Romain</div><div class="player-name">Marga F.</div><div class="pair-hcp">HCP 13</div></div>
   </div>
 
   <div class="match-row">
     <div class="pair-box"><div class="player-name">Alvero</div><div class="player-name">Emilio Gayo</div><div class="pair-hcp">HCP 17</div></div>
     <div class="result-box"><span class="pnum">P6</span><div class="result-line"></div>
-      <div style="display:flex;width:100%;height:12px;border-radius:3px;overflow:hidden;margin-top:3px">
-        <div style="width:41%;background:#8B93A0"></div>
-        <div style="width:14%;background:#ddd"></div>
-        <div style="width:45%;background:#4CAF3F"></div>
-      </div>
-      <div style="font-size:0.52rem;color:#888;text-align:center;margin-top:1px">41%–14%–45%</div><span class="diff-tag b">NachEle +4</span></div>
+      <div style="background:#C2CDD6;color:#0D1A0F;padding:5px 10px;border-radius:8px;font-weight:800;font-family:'Barlow Condensed',sans-serif;font-size:1rem;text-align:center;margin-top:4px">5&3</div><span class="diff-tag b">NachEle +4</span></div>
     <div class="pair-box"><div class="player-name">Tom</div><div class="player-name">Anabel</div><div class="pair-hcp">HCP 21</div></div>
   </div>
 
   <div class="match-row">
     <div class="pair-box"><div class="player-name">Marina</div><div class="player-name">Pablo R.</div><div class="pair-hcp">HCP 13</div></div>
     <div class="result-box"><span class="pnum">P7</span><div class="result-line"></div>
-      <div style="display:flex;width:100%;height:12px;border-radius:3px;overflow:hidden;margin-top:3px">
-        <div style="width:42%;background:#8B93A0"></div>
-        <div style="width:14%;background:#ddd"></div>
-        <div style="width:44%;background:#4CAF3F"></div>
-      </div>
-      <div style="font-size:0.52rem;color:#888;text-align:center;margin-top:1px">42%–14%–44%</div><span class="diff-tag a">Serch's +2</span></div>
+      <div style="background:#4CAF3F;color:white;padding:5px 10px;border-radius:8px;font-weight:800;font-family:'Barlow Condensed',sans-serif;font-size:1rem;text-align:center;margin-top:4px">2&1</div><span class="diff-tag a">Serch's +2</span></div>
     <div class="pair-box"><div class="player-name">Lucas</div><div class="player-name">Marta</div><div class="pair-hcp">HCP 11</div></div>
   </div>
 
   <div class="match-row">
     <div class="pair-box"><div class="player-name">Penny</div><div class="player-name">Roberto Nieto</div><div class="pair-hcp">HCP 17</div></div>
     <div class="result-box"><span class="pnum">P8</span><div class="result-line"></div>
-      <div style="display:flex;width:100%;height:12px;border-radius:3px;overflow:hidden;margin-top:3px">
-        <div style="width:45%;background:#8B93A0"></div>
-        <div style="width:14%;background:#ddd"></div>
-        <div style="width:42%;background:#4CAF3F"></div>
-      </div>
-      <div style="font-size:0.52rem;color:#888;text-align:center;margin-top:1px">45%–14%–42%</div><span class="diff-tag b">NachEle +2</span></div>
+      <div style="background:#4CAF3F;color:white;padding:5px 10px;border-radius:8px;font-weight:800;font-family:'Barlow Condensed',sans-serif;font-size:1rem;text-align:center;margin-top:4px">2UP</div><span class="diff-tag b">NachEle +2</span></div>
     <div class="pair-box"><div class="player-name">Alvarito Montoya</div><div class="player-name">Marga Cruz</div><div class="pair-hcp">HCP 19</div></div>
   </div>
 
@@ -326,9 +395,19 @@ body {
 
   <div class="totales">
     <div class="parcial-block">
-      <div class="parcial-box"><div class="label">Parcial Serch's</div><div class="valor">&nbsp;</div></div>
-      <div class="parcial-box"><div class="label">Parcial NachEle's</div><div class="valor">&nbsp;</div></div>
+      <div class="parcial-box"><div class="label">Parcial Serch's</div><div class="valor">3</div></div>
+      <div class="parcial-box"><div class="label">Parcial NachEle's</div><div class="valor">5</div></div>
     </div>
+  </div>
+
+  <div class="total-final">
+    <div class="team-name">Serch's Team</div>
+    <div class="score-boxes">
+      <div class="score-box">3</div>
+      <div class="vs">–</div>
+      <div class="score-box">5</div>
+    </div>
+    <div class="team-name">NachEle's Team</div>
   </div>
 
   <div class="capitanes">

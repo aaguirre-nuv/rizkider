@@ -1042,7 +1042,7 @@ table.ranking-table tr:last-child td { border-bottom: none; }
   </section>
 
   <div style="text-align:center;padding:20px;font-family:'Barlow Condensed',sans-serif;font-size:0.75rem;color:var(--gris);letter-spacing:0.05em">
-    Rizkider Cup · versión v3.3 — colores 2026 intercambiados: Serch's gris, NachEle's verde · actualizado 04-jul
+    Rizkider Cup · versión v3.5 — resultados reales de la Jornada 1 (parejas): NachEle's 5 – 3 Serch's · actualizado 04-jul
   </div>
 </main>
 
@@ -1380,6 +1380,7 @@ function renderEdicionPrevia(e) {
   }
 
   const tieneEnfrentamientos = e.partidosParejas && e.partidosParejas.length > 0;
+  const tieneIndividuales = e.partidosIndividuales && e.partidosIndividuales.length > 0;
 
   const html = `
     <div class="edicion-especial" style="margin-bottom:20px">
@@ -1391,6 +1392,7 @@ function renderEdicionPrevia(e) {
     </div>
 
     ${tieneEnfrentamientos ? buildEnfrentamientosHTML(e) : ''}
+    ${tieneIndividuales ? buildIndividualesHTML(e) : ''}
 
     <div class="jornada-section">
       <div class="jornada-header"><div class="jornada-titulo">Curiosidades del campo</div></div>
@@ -1561,6 +1563,132 @@ function buildEnfrentamientosHTML(e) {
   </div>`;
 }
 
+function buildIndividualesHTML(e) {
+  // ── Rating v2: shrinkage bayesiano + forma reciente (mismo criterio que parejas) ──
+  const EDIC_REC = new Set([18,19,20]);
+  const K=10, KR=5;
+  const ps2 = {};
+  D.jugadores.forEach(j => { ps2[j.num] = {r:0,g:0,e:0,pts:0,rr:0,gr:0,er:0,ptsr:0}; });
+
+  D.individuales.forEach(r => {
+    const rec = EDIC_REC.has(r.edicion);
+    [[r.jugA,r.ptosA,r.rdoA],[r.jugB,r.ptosB,-r.rdoA]].forEach(([num,pts,rdo]) => {
+      if (!num||!ps2[num]) return;
+      const s=ps2[num]; s.r++; s.pts+=pts||0;
+      if(rdo>0) s.g++; else if(rdo===0) s.e++;
+      if(rec){s.rr++;s.ptsr+=pts||0;if(rdo>0)s.gr++;else if(rdo===0)s.er++;}
+    });
+  });
+  D.parejas.forEach(r => {
+    const rec = EDIC_REC.has(r.edicion);
+    [[r.jug1A,r.jug2A,'A'],[r.jug1B,r.jug2B,'B']].forEach(([n1,n2,side]) => {
+      const pts=side==='A'?r.ptosA:r.ptosB, rdo=side==='A'?r.rdoA:-r.rdoA;
+      [n1,n2].forEach(num => {
+        if(!num||!ps2[num]) return;
+        const s=ps2[num]; s.r++; s.pts+=pts||0;
+        if(rdo>0)s.g++;else if(rdo===0)s.e++;
+        if(rec){s.rr++;s.ptsr+=pts||0;if(rdo>0)s.gr++;else if(rdo===0)s.er++;}
+      });
+    });
+  });
+
+  const vets = Object.values(ps2).filter(s=>s.r>=5);
+  const avgWP  = vets.reduce((a,s)=>a+(s.g+s.e*.5)/s.r,0)/vets.length;
+  const avgPPR = vets.reduce((a,s)=>a+s.pts/s.r,0)/vets.length;
+  function rawScore(wp,ppr){return .55*(wp/avgWP)+.45*(ppr/avgPPR);}
+
+  function rating2(num) {
+    const s=ps2[num];
+    if(!s||s.r===0) return 1.0;
+    const n=s.r, wp=(s.g+s.e*.5)/n, ppr=s.pts/n;
+    const rt=(n*rawScore(wp,ppr)+K*1.0)/(n+K);
+    if(s.rr>=2){
+      const wpr=(s.gr+s.er*.5)/s.rr, pprr=s.ptsr/s.rr;
+      const rr=(s.rr*rawScore(wpr,pprr)+KR*1.0)/(s.rr+KR);
+      return .6*rt+.4*rr;
+    }
+    return rt;
+  }
+
+  const TIE_MAX=0.14, TIE_MIN=0.05, GAMMA=1.4;
+  function tieProb(p) {
+    const gap = Math.abs(p-0.5)/0.5;
+    return TIE_MAX - (TIE_MAX-TIE_MIN)*Math.pow(gap,GAMMA);
+  }
+
+  const jugById = {};
+  D.jugadores.forEach(j => { jugById[j.num]=j; });
+
+  // Colores del día 2 (mañana): distintos a los de parejas si están definidos
+  const colorA2 = e.equipoA.color1Dia2 || e.equipoA.color1;
+  const colorB2 = e.equipoB.color1Dia2 || e.equipoB.color1;
+  const bgA = colorA2?colorHex(colorA2):'var(--verde)';
+  const bgB = colorB2?colorHex(colorB2):'var(--gris)';
+  const txtA = COLOR_LIGHT.has(colorA2)?'var(--negro)':'white';
+  const txtB = COLOR_LIGHT.has(colorB2)?'var(--negro)':'white';
+
+  let favS=0, favN=0;
+
+  const rows = e.partidosIndividuales.map(m => {
+    const jA=jugById[m.jugA], jB=jugById[m.jugB];
+    const rA=rating2(m.jugA), rB=rating2(m.jugB);
+    const p=rA/(rA+rB);
+    const pE=tieProb(p);
+    const resto=1-pE;
+    let pS=Math.round(p*resto*100), pN=Math.round((1-p)*resto*100);
+    const pEm=100-pS-pN;
+    if (pS>pN) favS++; else if (pN>pS) favN++;
+
+    const jugado = m.rdoA !== null && m.rdoA !== undefined;
+    let resultadoCol;
+    if (jugado) {
+      const rdo=m.rdoA, mag=Math.abs(rdo);
+      const txt = rdo===0 ? 'AS' : (m.hoyos>0 ? `${mag}&${m.hoyos}` : `${mag}UP`);
+      const winA=rdo>0, winB=rdo<0;
+      const bg=winA?bgA:winB?bgB:'var(--gris-claro)';
+      const tc=winA?txtA:winB?txtB:'var(--gris)';
+      resultadoCol = `<span style="background:${bg};color:${tc};padding:5px 14px;border-radius:10px;font-weight:700;font-family:'Barlow Condensed',sans-serif;font-size:0.9rem">${txt}</span>`;
+    } else {
+      const favoritoA = pS > pN;
+      const favoritoB = pN > pS;
+      const styleA = favoritoA
+        ? `background:${bgA};color:${txtA};font-size:0.82rem;font-weight:800;box-shadow:inset 0 0 0 2px rgba(255,255,255,0.4)`
+        : `background:color-mix(in srgb,${bgA} 45%,#e8e8e8);color:color-mix(in srgb,${txtA} 55%,#888);font-size:0.6rem;font-weight:600;opacity:0.85`;
+      const styleB = favoritoB
+        ? `background:${bgB};color:${txtB};font-size:0.82rem;font-weight:800;box-shadow:inset 0 0 0 2px rgba(255,255,255,0.4)`
+        : `background:color-mix(in srgb,${bgB} 45%,#e8e8e8);color:color-mix(in srgb,${txtB} 55%,#888);font-size:0.6rem;font-weight:600;opacity:0.85`;
+      resultadoCol = `<div style="display:flex;border-radius:6px;overflow:hidden;height:28px;width:100%;min-width:120px">
+        <div style="width:${pS}%;display:flex;align-items:center;justify-content:center;${styleA}">${pS}%</div>
+        ${pEm>3?`<div style="width:${pEm}%;background:var(--gris-claro);display:flex;align-items:center;justify-content:center;color:var(--gris);font-size:0.56rem">${pEm}%</div>`:''}
+        <div style="width:${pN}%;display:flex;align-items:center;justify-content:center;${styleB}">${pN}%</div>
+      </div>`;
+    }
+
+    return `<tr style="border-bottom:1px solid var(--gris-claro)">
+      <td style="padding:10px 14px">
+        <div style="font-weight:700;font-family:'Barlow Condensed',sans-serif">${jA.mote}</div>
+      </td>
+      <td style="padding:10px 8px;width:130px;text-align:center">${resultadoCol}</td>
+      <td style="padding:10px 14px;text-align:right">
+        <div style="font-weight:700;font-family:'Barlow Condensed',sans-serif">${jB.mote}</div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  return `
+  <div class="jornada-section" style="margin-bottom:20px">
+    <div class="jornada-header" style="background:linear-gradient(135deg,#1B5229,#2D7A3A)">
+      <div class="jornada-titulo">⛳ Enfrentamientos — Jornada 2 · Individual</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.72rem;color:rgba(255,255,255,0.55)">Match Play · 1 vs 1 · rating histórico ajustado</div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;background:white">
+      <tbody>${rows}</tbody>
+    </table>
+    <div style="padding:8px 16px;font-family:'Barlow Condensed',sans-serif;font-size:0.7rem;color:var(--gris);text-align:center">
+      Favorito en ${favS} partidos para ${e.equipoA.nombre.split("'")[0]} · ${favN} para ${e.equipoB.nombre.split("'")[0]} · predicción, no resultado oficial
+    </div>
+  </div>`;
+}
 
 function renderEdicionCelebrada(e) {
   const num = e.edicion;
